@@ -33,12 +33,14 @@ class cabot::install inherits ::cabot {
     if ($install_nodejs) {
       include ::nodejs
 
-      #TODO add to nodejs profile
-	    # BUG in 0.7.1 on Ubuntu 14.04 ??
-	    package { 'npm':
-	      ensure  => present,
-	      require => Anchor['nodejs::repo']
-	    }
+      # TODO ADD NPM HERE LATER
+    }
+
+    #TODO add to nodejs profile
+    # BUG in 0.7.1 on Ubuntu 14.04 ??
+    package { 'npm':
+      ensure  => present,
+      require => Anchor['nodejs::repo']
     }
 
 
