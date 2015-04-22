@@ -8,20 +8,23 @@ class cabot::postgres inherits ::cabot {
   $ip_mask_allow_all_users    = '0.0.0.0/0'
 
   # puppetlabs/postgresql
-  # TODO if ()
-  class { '::postgresql::server':
-    listen_addresses        => $listen_addresses,
-    ip_mask_allow_all_users => $ip_mask_allow_all_users,
+  if ($install_postgres) {
+	  class { '::postgresql::server':
+	    listen_addresses        => $listen_addresses,
+	    ip_mask_allow_all_users => $ip_mask_allow_all_users,
+	  }
   }
 
-  # TODO if ()
-  include ::postgresql::lib::devel
+  # TODO MOVE TO POSTGRES PROFILE
+  if ($install_postgres_devel) {
+    include ::postgresql::lib::devel
+  }
 
   # Setup DB
-  # TODO if ()
-  # TODO PARAMS !!
-  postgresql::server::db { 'cabot':
-    user     => 'cabot',
-    password => postgresql_password('cabot', 'cabot'),
+  if ($setup_db) {
+    postgresql::server::db { $db_database:
+	    user     => $db_username,
+	    password => postgresql_password($db_username, $db_password),
+	  }
   }
 }

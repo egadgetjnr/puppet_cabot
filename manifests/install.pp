@@ -5,36 +5,42 @@
 class cabot::install inherits ::cabot {
   # Dependencies
     # puppetlabs/gcc
-    # TODO if ()
-    include ::gcc
+    if ($install_gcc) {
+      include ::gcc
+    }
 
     # puppetlabs/git
-    # TODO if ()
-    include ::git
+    if ($install_git) {
+      include ::git
+    }
 
     # puppetlabs/ruby
-    # TODO if ()
-    include ::ruby
+    if ($install_ruby) {
+      include ::ruby
+    }
 
     # stankevich/python
-    # TODO if ()
-    class { 'python' :
-      pip        => true,
-      dev        => true,
-      virtualenv => true,
-      gunicorn   => true,
-    }
+    if ($install_python) {
+	    class { '::python' :
+	      pip        => true,
+	      dev        => true,
+	      virtualenv => true,
+	      gunicorn   => true,
+	    }
+	  }
 
     # puppetlabs/nodejs
-    # TODO if ()
-    include ::nodejs
+    if ($install_nodejs) {
+      include ::nodejs
 
-    # BUG in 0.7.1 on Ubuntu 14.04 ??
-    package { 'npm':
-      ensure  => present,
-      name    => 'npm',
-      require => Anchor['nodejs::repo']
+      #TODO add to nodejs profile
+	    # BUG in 0.7.1 on Ubuntu 14.04 ??
+	    package { 'npm':
+	      ensure  => present,
+	      require => Anchor['nodejs::repo']
+	    }
     }
+
 
   # Other Packages
   package { 'foreman':

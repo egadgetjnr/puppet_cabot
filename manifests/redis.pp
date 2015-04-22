@@ -11,10 +11,12 @@ class cabot::redis inherits ::cabot {
   $password = false
   $tune_max_mem = '1gb'
 
-  class { '::redis':
-    redis_bind_address => $bind_address,
-    redis_port         => $port,
-    redis_password     => $password,
-    redis_max_memory   => $tune_max_mem,
+  if ($install_redis) {
+	  class { '::redis':
+	    redis_bind_address => $bind_address,
+	    redis_port         => $port,
+	    redis_password     => $password,
+	    redis_max_memory   => $tune_max_mem,
+	  }
   }
 }
