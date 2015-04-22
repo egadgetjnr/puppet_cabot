@@ -1,15 +1,34 @@
-# Class: puppet_cabot
+# Class: cabot
 #
-# This module manages puppet_cabot
+# This module manages Arachnys Cabot
 #
-# Parameters: none
-#
-# Actions:
+# Parameters:
+# TODO
 #
 # Requires: see Modulefile
 #
 # Sample Usage:
 #
-class puppet_cabot {
+class cabot (
+  # TODO
 
+
+) inherits cabot::params {
+  # Sub-classes
+  contain cabot::postgres
+  contain cabot::install
+  contain cabot::configure
+  contain cabot::redis
+  contain cabot::webserver
+
+  # Dependency Chain
+  Class['cabot::postgres']
+  ->
+  Class['cabot::install']
+  ->
+  Class['cabot::configure']
+  ->
+  Class['cabot::redis']
+  ->
+  Class['cabot::webserver']
 }
