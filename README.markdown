@@ -1,0 +1,3 @@
+# puppet_cabot #
+
+This is the puppet_cabot module. It provides...
