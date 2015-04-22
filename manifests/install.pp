@@ -37,11 +37,12 @@ class cabot::install inherits ::cabot {
     }
 
     #TODO add to nodejs profile
-    # BUG in 0.7.1 on Ubuntu 14.04 ??
-    package { 'npm':
-      ensure  => present,
-      require => Anchor['nodejs::repo']
-    }
+    # BUG in 0.7.1 on Ubuntu 12.04 ??
+    # NOT REQUIRED on Ubuntu 14.04 !!!
+#    package { 'npm':
+#      ensure  => present,
+#      require => Anchor['nodejs::repo']
+#    }
 
 
   # Other Packages
@@ -49,8 +50,7 @@ class cabot::install inherits ::cabot {
     provider => 'gem',
   }
 
-  Package['npm']
-  ->
+  #Package['npm'] ->   # NOT REQUIRED on Ubuntu 14.04 !!!
   package { ['coffee-script', 'less@1.3']:
     ensure   => 'present',
     provider => 'npm',
