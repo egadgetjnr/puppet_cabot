@@ -17,7 +17,9 @@ class cabot::postgres inherits ::cabot {
 
   # TODO MOVE TO POSTGRES PROFILE
   if ($install_postgres_devel) {
-    include ::postgresql::lib::devel
+    class { '::postgresql::lib::devel':
+      link_pg_config => true,
+    }
   }
 
   # Setup DB
