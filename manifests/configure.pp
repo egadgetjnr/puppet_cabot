@@ -126,10 +126,10 @@ class cabot::configure inherits ::cabot {
   $user = 'root'  # TODO .?.
 
   exec { 'cabot init-script':
-    command     => "export HOME=$source_dir; ${foreman} export upstart /etc/init -f ${procfile} -e ${env_file} -u ${user} -a cabot -t ${template}",
+    command     => "bash -c 'export HOME=$source_dir; ${foreman} export upstart /etc/init -f ${procfile} -e ${env_file} -u ${user} -a cabot -t ${template}'",
     cwd         => $source_dir,
-    subscribe   => Exec['cabot compress'],
-    refreshonly => true,
+    #subscribe   => Exec['cabot compress'],
+    #refreshonly => true,
     path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
   }
 
