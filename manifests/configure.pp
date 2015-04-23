@@ -126,13 +126,16 @@ class cabot::configure inherits ::cabot {
   $user = 'root'  # TODO .?.
 
   exec { 'cabot init-script':
-    command     => "${foreman} export upstart /etc/init -f ${procfile} -e ${env_file} -u ${user} -a cabot -t ${template}",
+    command     => "export HOME=$source_dir; ${foreman} export upstart /etc/init -f ${procfile} -e ${env_file} -u ${user} -a cabot -t ${template}",
     cwd         => $source_dir,
-    #subscribe   => Exec['cabot compress'],
-    subscribe   => Exec['cabot migrate djcelery'],
+    subscribe   => Exec['cabot compress'],
     refreshonly => true,
     path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
   }
 
-  #TODO Service ?
+  service { 'cabot':
+    ensure => running,
+    # provider => upstart,
+    require => Exec['cabot init-script'],
+  }
 }
