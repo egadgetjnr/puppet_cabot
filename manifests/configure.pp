@@ -19,7 +19,7 @@ class cabot::configure inherits ::cabot {
 
   # Bugfixes for Cabot 0.0.1-dev
   exec { 'cabot 0.0.1-dev bugfix1':
-    command     => "/bin/sed -e '/distribute==/d' ${source_dir}/setup.py",
+    command     => "/bin/sed -i '/distribute==/d' ${source_dir}/setup.py",
     cwd         => $source_dir,
     subscribe   => Python::Virtualenv[$env_dir],
     refreshonly => true,
