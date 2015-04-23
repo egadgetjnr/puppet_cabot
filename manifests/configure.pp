@@ -139,6 +139,7 @@ class cabot::configure inherits ::cabot {
     subscribe   => Exec['cabot compress'],
     refreshonly => true,
     path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
+    notify      => Service['cabot'],
   }
 
   service { 'cabot':
