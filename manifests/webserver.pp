@@ -20,14 +20,14 @@ class cabot::webserver inherits ::cabot {
 
 	    aliases             => [
         {
-	        alias => '/content/',
-	        path  => "${source_dir}/content/",
+	        alias => '/static/',
+	        path  => "${source_dir}/static/",
         },
       ],
 
 	    directories         => [
         {
-            path           => '/content/',
+            path           => '/static/',
             provider       => 'location',
             sethandler     => 'None',
             options        => [ 'All' ],
