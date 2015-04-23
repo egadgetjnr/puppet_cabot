@@ -55,7 +55,7 @@ class cabot::configure inherits ::cabot {
   $config_redis_port     = $redis_port
   $config_redis_database = $redis_database
 
-  $config_graphite_host     = $graphite_host
+  $config_graphite_host     = "http://${graphiteweb_host}:${graphiteweb_port}/"
   $config_graphite_username = $graphite_username
   $config_graphite_password = $graphite_password
 

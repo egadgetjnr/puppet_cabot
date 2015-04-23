@@ -61,7 +61,8 @@ class cabot (
   $webserver_port     = 80,
 
   # Graphite
-  $graphite_host      = $::fqdn,
+  $graphiteweb_host   = $::fqdn,
+  $graphiteweb_port   = '80',
   $graphite_username  = '',
   $graphite_password  = '',
 ) inherits cabot::params {
