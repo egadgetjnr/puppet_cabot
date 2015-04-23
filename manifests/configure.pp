@@ -72,7 +72,7 @@ class cabot::configure inherits ::cabot {
 
   # DB Setup
   exec { 'cabot syncdb':
-    command     => "bash -c '${source_activate}; ${foreman_run} python manage.py syncdb --noinput'",
+    command     => "bash -c '${source_activate}; ${foreman_run} ${env_dir}/bin/python manage.py syncdb --noinput'",# PYTHON NORMAL ??
     cwd         => $source_dir,
     subscribe   => Exec['cabot install'],
     refreshonly => true,
@@ -81,7 +81,7 @@ class cabot::configure inherits ::cabot {
 
   $create_user_code = "from django.contrib.auth.models import User; User.objects.create_superuser('${django_username}', '${admin_address}', '${django_password}')"
   exec { 'cabot create user':
-    command     => "bash -c '${source_activate}; echo \"${create_user_code}\" | ${foreman_run} python manage.py shell'",
+    command     => "bash -c '${source_activate}; echo \"${create_user_code}\" | ${foreman_run} ${env_dir}/bin/python manage.py shell'",# PYTHON NORMAL ??
     cwd         => $source_dir,
     subscribe   => Exec['cabot syncdb'],
     refreshonly => true,
@@ -89,7 +89,7 @@ class cabot::configure inherits ::cabot {
   }
 
   exec { 'cabot migrate cabotapp':
-    command     => "bash -c '${source_activate}; ${foreman_run} python manage.py migrate cabotapp --noinput'",
+    command     => "bash -c '${source_activate}; ${foreman_run} ${env_dir}/bin/python manage.py migrate cabotapp --noinput'",# PYTHON NORMAL ??
     cwd         => $source_dir,
     subscribe   => Exec['cabot syncdb'],
     refreshonly => true,
@@ -97,38 +97,31 @@ class cabot::configure inherits ::cabot {
   }
 
   exec { 'cabot migrate djcelery':
-    command     => "bash -c '${source_activate}; ${foreman_run} python manage.py migrate djcelery --noinput'",
+    command     => "bash -c '${source_activate}; ${foreman_run} ${env_dir}/bin/python manage.py migrate djcelery --noinput'",# PYTHON NORMAL ??
     cwd         => $source_dir,
     subscribe   => Exec['cabot migrate cabotapp'],
     refreshonly => true,
     path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
   }
 
-  # TODO !!
+  exec { 'cabot collectstatic':
+    command     => "${foreman_run} ${env_dir}/bin/python manage.py collectstatic --noinput",
+    cwd         => $source_dir,
+    subscribe   => Exec['cabot migrate djcelery'],
+    refreshonly => true,
+    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
+  }
 
-#DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-#export PATH=$PATH:$DIR/../bin:$DIR/../app
-#export PYTHONPATH=$PYTHONPATH:$DIR/../app
-
-#  exec { 'cabot collectstatic':
-#    command     => "${foreman_run} python manage.py collectstatic --noinput",
-#    cwd         => $source_dir,
-#    subscribe   => Exec['cabot migrate djcelery'],
-#    refreshonly => true,
-#    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
-#  }
-#
-#  exec { 'cabot compress':
-#    command     => "${foreman_run} python manage.py compress",    # COMPRESS_ENABLED
-#    cwd         => $source_dir,
-#    subscribe   => Exec['cabot collectstatic'],
-#    refreshonly => true,
-#    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
-#  }
-  # END TODO
+  exec { 'cabot compress':
+    command     => "${foreman_run} ${env_dir}/bin/python manage.py compress",
+    cwd         => $source_dir,
+    subscribe   => Exec['cabot collectstatic'],
+    refreshonly => true,
+    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
+  }
 
   $procfile = "${source_dir}/Procfile"
-  $env_file = "${source_dir}/conf/${ENV}.env"
+  $env_file = "${env_dir}/conf/${ENV}.env"
   $template = "${source_dir}/upstart"
   $user = 'root'  # TODO .?.
 
