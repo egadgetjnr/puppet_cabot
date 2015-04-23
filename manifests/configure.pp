@@ -52,8 +52,12 @@ class cabot::configure inherits ::cabot {
   $config_db_database = $db_database
 
   $config_redis_hostname = $redis_hostname
-  $config_redis_port = $redis_port
+  $config_redis_port     = $redis_port
   $config_redis_database = $redis_database
+
+  $config_graphite_host     = $graphite_host
+  $config_graphite_username = $graphite_username
+  $config_graphite_password = $graphite_password
 
   file { "${env_dir}/conf/${ENV}.env":
     ensure  => 'file',
@@ -79,14 +83,17 @@ class cabot::configure inherits ::cabot {
     path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
   }
 
-  $create_user_code = "from django.contrib.auth.models import User; User.objects.create_superuser('${django_username}', '${admin_address}', '${django_password}')"
-  exec { 'cabot create user':
-    command     => "bash -c '${source_activate}; echo \"${create_user_code}\" | ${foreman_run} ${env_dir}/bin/python manage.py shell'",# PYTHON NORMAL ??
-    cwd         => $source_dir,
-    subscribe   => Exec['cabot syncdb'],
-    refreshonly => true,
-    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
-  }
+# FAILS !!!
+#  $create_user_code = "from django.contrib.auth.models import User; User.objects.create_superuser('${django_username}', '${admin_address}', '${django_password}')"
+#  exec { 'cabot create user':
+#    command     => "bash -c '${source_activate}; echo \"${create_user_code}\" | ${foreman_run} ${env_dir}/bin/python manage.py shell'",# PYTHON NORMAL ??
+#    cwd         => $source_dir,
+#    subscribe   => Exec['cabot syncdb'],
+#    refreshonly => true,
+#    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
+#  }
+
+# foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py createsuperuser --username root2 --email nicolas@truyens.com => REQUIRES PASSWORD !!!
 
   exec { 'cabot migrate cabotapp':
     command     => "bash -c '${source_activate}; ${foreman_run} ${env_dir}/bin/python manage.py migrate cabotapp --noinput'",# PYTHON NORMAL ??

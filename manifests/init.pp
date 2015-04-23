@@ -59,6 +59,11 @@ class cabot (
   $install_apache     = false,
   $setup_apache       = true,
   $webserver_port     = 80,
+
+  # Graphite
+  $graphite_host      = $::fqdn,
+  $graphite_username  = '',
+  $graphite_password  = '',
 ) inherits cabot::params {
   # Sub-classes
   contain cabot::postgres
