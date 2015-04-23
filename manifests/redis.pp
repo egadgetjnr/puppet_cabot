@@ -3,20 +3,13 @@
 # Private class. Only calling cabot main class is supported.
 #
 class cabot::redis inherits ::cabot {
-  # thomasvandoren/redis
-
-  # TODO MOVE TO MAIN CLASS
-  $bind_address = false
-  $port = '6379'
-  $password = false
-  $tune_max_mem = '1gb'
-
   if ($install_redis) {
+    # thomasvandoren/redis
 	  class { '::redis':
-	    redis_bind_address => $bind_address,
-	    redis_port         => $port,
-	    redis_password     => $password,
-	    redis_max_memory   => $tune_max_mem,
+	    redis_bind_address => $redis_bind_address,
+	    redis_port         => $redis_port,
+	    redis_password     => $redis_password,
+	    redis_max_memory   => $redis_tune_max_mem,
 	  }
   }
 }

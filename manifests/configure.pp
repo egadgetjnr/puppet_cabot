@@ -3,14 +3,11 @@
 # Private class. Only calling cabot main class is supported.
 #
 class cabot::configure inherits ::cabot {
-  # TODO PARAMS
-  $source_dir = '/opt/cabot_source'
-  $env_dir = '/opt/cabot_venv'
-  $ENV = 'development'
-  $foreman = '/usr/local/bin/foreman'
-
   # Local Parameters (shorthands)
-  $foreman_run = "${foreman} run -e conf/${ENV}.env"
+  $ENV = $environment
+  $foreman_run = "${foreman} run -e ${env_dir}/conf/${ENV}.env"
+  $source_activate = "source ${env_dir}/bin/activate"
+
 
   # Create Python VirtualEnv
   python::virtualenv { $env_dir :
@@ -19,13 +16,44 @@ class cabot::configure inherits ::cabot {
     #group        => 'apps',
   }
 
-  # BUGFIX FOR SETUPTOOLS 15.1 wget https://bootstrap.pypa.io/ez_setup.py -O - | python
+
+  # Bugfixes for Cabot 0.0.1-dev
+  exec { 'cabot 0.0.1-dev bugfix1':
+    command     => "/bin/sed -e '/distribute==/d' ${source_dir}/setup.py",
+    cwd         => $source_dir,
+    subscribe   => Python::Virtualenv[$env_dir],
+    refreshonly => true,
+  } -> Exec['cabot install']
 
 
+  # Setup Log Dir
+  file { $log_dir:
+    ensure  => 'directory',
+  }
+
+
+  # Setup Configuration
   file { "${env_dir}/conf":
     ensure  => 'directory',
     require => Python::Virtualenv[$env_dir]
   }
+
+  # Configuration TEMPLATE
+  $config_env_dir       = $env_dir
+  $config_port          = $port
+  $config_timezone      = $timezone
+  $config_admin_address = $admin_address
+  $config_django_secret = $django_secret
+
+  $config_db_username = $db_username
+  $config_db_password = $db_password
+  $config_db_hostname = $db_hostname
+  $config_db_port     = $db_port
+  $config_db_database = $db_database
+
+  $config_redis_hostname = $redis_hostname
+  $config_redis_port = $redis_port
+  $config_redis_database = $redis_database
 
   file { "${env_dir}/conf/${ENV}.env":
     ensure  => 'file',
@@ -33,6 +61,8 @@ class cabot::configure inherits ::cabot {
     require => File["${env_dir}/conf"]
   }
 
+
+  # Installation
   exec { 'cabot install':
     command     => "${foreman_run} ${env_dir}/bin/pip install --timeout=30 --editable ${source_dir} --exists-action=w",
     cwd         => $env_dir,
@@ -40,44 +70,62 @@ class cabot::configure inherits ::cabot {
     refreshonly => true,
   }
 
+  # DB Setup
   exec { 'cabot syncdb':
-    command     => "${foreman_run} python manage.py syncdb",
-    cwd         => $env_dir,
+    command     => "bash -c '${source_activate}; ${foreman_run} python manage.py syncdb --noinput'",
+    cwd         => $source_dir,
     subscribe   => Exec['cabot install'],
     refreshonly => true,
+    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
+  }
+
+  $create_user_code = "from django.contrib.auth.models import User; User.objects.create_superuser('${django_username}', '${admin_address}', '${django_password}')"
+  exec { 'cabot create user':
+    command     => "bash -c '${source_activate}; echo \"${create_user_code}\" | ${foreman_run} python manage.py shell'",
+    cwd         => $source_dir,
+    subscribe   => Exec['cabot syncdb'],
+    refreshonly => true,
+    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
   }
 
   exec { 'cabot migrate cabotapp':
-    command     => "${foreman_run} python manage.py migrate cabotapp --noinput",
-    cwd         => $env_dir,
+    command     => "bash -c '${source_activate}; ${foreman_run} python manage.py migrate cabotapp --noinput'",
+    cwd         => $source_dir,
     subscribe   => Exec['cabot syncdb'],
     refreshonly => true,
+    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
   }
 
   exec { 'cabot migrate djcelery':
-    command     => "${foreman_run} python manage.py migrate djcelery --noinput",
-    cwd         => $env_dir,
+    command     => "bash -c '${source_activate}; ${foreman_run} python manage.py migrate djcelery --noinput'",
+    cwd         => $source_dir,
     subscribe   => Exec['cabot migrate cabotapp'],
     refreshonly => true,
+    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
   }
+
+  # TODO !!
 
 #DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #export PATH=$PATH:$DIR/../bin:$DIR/../app
 #export PYTHONPATH=$PYTHONPATH:$DIR/../app
 
-  exec { 'cabot collectstatic':
-    command     => "${foreman_run} python manage.py collectstatic --noinput",
-    cwd         => $env_dir,
-    subscribe   => Exec['cabot migrate djcelery'],
-    refreshonly => true,
-  }
-
-  exec { 'cabot compress':
-    command     => "${foreman_run} compress",
-    cwd         => $env_dir,
-    subscribe   => Exec['cabot collectstatic'],
-    refreshonly => true,
-  }
+#  exec { 'cabot collectstatic':
+#    command     => "${foreman_run} python manage.py collectstatic --noinput",
+#    cwd         => $source_dir,
+#    subscribe   => Exec['cabot migrate djcelery'],
+#    refreshonly => true,
+#    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
+#  }
+#
+#  exec { 'cabot compress':
+#    command     => "${foreman_run} python manage.py compress",    # COMPRESS_ENABLED
+#    cwd         => $source_dir,
+#    subscribe   => Exec['cabot collectstatic'],
+#    refreshonly => true,
+#    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
+#  }
+  # END TODO
 
   $procfile = "${source_dir}/Procfile"
   $env_file = "${source_dir}/conf/${ENV}.env"
@@ -86,9 +134,10 @@ class cabot::configure inherits ::cabot {
 
   exec { 'cabot init-script':
     command     => "${foreman} export upstart /etc/init -f ${procfile} -e ${env_file} -u ${user} -a cabot -t ${template}",
-    cwd         => $env_dir,
+    cwd         => $source_dir,
     subscribe   => Exec['cabot compress'],
     refreshonly => true,
+    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
   }
 
   #TODO Service ?

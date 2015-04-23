@@ -17,8 +17,9 @@ class cabot::postgres inherits ::cabot {
 
   # TODO MOVE TO POSTGRES PROFILE
   if ($install_postgres_devel) {
+    # ONLY ON POSTGRES CLIENT (NOT ON SERVER !!!)
     class { '::postgresql::lib::devel':
-      link_pg_config => true,
+      link_pg_config => true,           # SERIOUSLY FLAWED WHEN RUNNING SERVER ON 14.04 !!! RATHER NOT INSTALL IT ??
     }
   }
 

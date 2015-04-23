@@ -25,7 +25,7 @@ class cabot::install inherits ::cabot {
 	      pip        => true,
 	      dev        => true,
 	      virtualenv => true,
-	      gunicorn   => true,
+	      #gunicorn   => false,
 	    }
 	  }
 
@@ -33,17 +33,14 @@ class cabot::install inherits ::cabot {
     if ($install_nodejs) {
       include ::nodejs
 
-      # TODO ADD NPM HERE LATER
-    }
-
-    #TODO add to nodejs profile
-    # BUG in 0.7.1 on Ubuntu 12.04 ??
-    # NOT REQUIRED on Ubuntu 14.04 !!!
+      #TODO add to nodejs profile
+      # BUG in 0.7.1 on Ubuntu 12.04 ??
+      # NOT REQUIRED on Ubuntu 14.04 !!!
 #    package { 'npm':
 #      ensure  => present,
 #      require => Anchor['nodejs::repo']
 #    }
-
+    }
 
   # Other Packages
   package { 'foreman':
@@ -58,12 +55,10 @@ class cabot::install inherits ::cabot {
 
 
   # Get Source Code
-  $source_dir = '/opt/cabot_source'  # TODO
-
   # puppetlabs/vcsrepo
   vcsrepo { $source_dir:
     ensure   => present,
     provider => git,
-    source   => 'https://github.com/arachnys/cabot.git',
+    source   => $git_url,
   }
 }

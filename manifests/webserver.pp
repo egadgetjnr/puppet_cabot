@@ -3,7 +3,20 @@
 # Private class. Only calling cabot main class is supported.
 #
 class cabot::webserver inherits ::cabot {
-  # puppetlabs/apache
+  if ($install_apache) {
+    # puppetlabs/apache
+
+
+
+
+
+
+
+
+
+
+  }
+
 
 
 
