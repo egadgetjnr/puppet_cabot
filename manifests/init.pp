@@ -57,8 +57,8 @@ class cabot (
 
   # Webserver
   $install_apache     = false,
-
-
+  $setup_apache       = true,
+  $webserver_port     = 80,
 ) inherits cabot::params {
   # Sub-classes
   contain cabot::postgres
