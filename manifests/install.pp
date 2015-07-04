@@ -53,6 +53,18 @@ class cabot::install inherits ::cabot {
     provider => 'npm',
   } # http://registry.npmjs.org/
 
+  # TODO !!!
+  #  package { 'postgresql':
+  #    ensure => 'installed',
+  #  }
+  #  ->
+  #  package { 'python-psycopg2':
+  #    ensure => 'installed',
+  #  }
+  #  ->
+  #  package { ['libpq-dev', 'libldap2-dev', 'libsasl2-dev']:
+  #    ensure => 'installed',
+  #  }
 
   # Get Source Code
   # puppetlabs/vcsrepo

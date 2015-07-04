@@ -93,6 +93,7 @@ class cabot::configure inherits ::cabot {
 #    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
 #  }
 
+  # TODO MANUAL RUN FOR NOW
 # foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py createsuperuser --username root2 --email nicolas@truyens.com => REQUIRES PASSWORD !!!
 
   exec { 'cabot migrate cabotapp':
