@@ -80,6 +80,7 @@ class cabot (
   $config_smtp_password = undef,
 
   # Sensu
+  $sensu_port = '3030',
 
   # Flapjack
 
