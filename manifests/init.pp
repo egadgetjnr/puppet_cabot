@@ -65,6 +65,24 @@ class cabot (
   $graphiteweb_port   = '80',
   $graphite_username  = '',
   $graphite_password  = '',
+
+  # Alert Plugins
+  $config_plugins_enabled = 'cabot_alert_hipchat==1.6.1,cabot_alert_twilio==1.1.4,cabot_alert_email==1.3.1',
+
+  # Hipchat
+  $config_hipchat_room_id = undef,
+  $config_hipchat_api_key = undef,
+
+  # SMTP
+  $config_smtp_host = undef,
+  $config_smtp_port = undef,
+  $config_smtp_username = undef,
+  $config_smtp_password = undef,
+
+  # Sensu
+
+  # Flapjack
+
 ) inherits cabot::params {
   # Sub-classes
   contain cabot::postgres
