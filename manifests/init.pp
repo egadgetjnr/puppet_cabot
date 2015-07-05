@@ -68,6 +68,7 @@ class cabot (
 
   # Alert Plugins
   $config_plugins_enabled = 'cabot_alert_hipchat==1.6.1,cabot_alert_twilio==1.1.4,cabot_alert_email==1.3.1',
+  $www_hostname           = $::fqdn,
 
   # Hipchat
   $config_hipchat_room_id = undef,
