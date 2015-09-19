@@ -69,7 +69,7 @@ class cabot::install inherits ::cabot {
   # Get Source Code
   # puppetlabs/vcsrepo
   vcsrepo { $source_dir:
-    ensure   => present,
+    ensure   => latest,  # TODO pin? (present)
     provider => git,
     source   => $git_url,
   }
