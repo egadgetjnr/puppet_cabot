@@ -48,7 +48,7 @@ class cabot::install inherits ::cabot {
   }
 
   #Package['npm'] ->   # NOT REQUIRED on Ubuntu 14.04 !!!
-  package { ['coffee-script', 'less@1.3']:
+  package { ['coffee-script']:  # TODO keeps updating:    'less@1.3'
     ensure   => 'present',
     provider => 'npm',
   } # http://registry.npmjs.org/
@@ -69,7 +69,7 @@ class cabot::install inherits ::cabot {
   # Get Source Code
   # puppetlabs/vcsrepo
   vcsrepo { $source_dir:
-    ensure   => latest,  # TODO pin? (present)
+    ensure   => present,  # TODO pin/update !! PARAM!
     provider => git,
     source   => $git_url,
   }
