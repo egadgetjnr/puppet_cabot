@@ -65,26 +65,40 @@ class cabot (
   $graphiteweb_port   = '80',
   $graphite_username  = '',
   $graphite_password  = '',
+  $graphite_from      = undef,  # Default: -10minute
 
   # Alert Plugins
-  $config_plugins_enabled = 'cabot_alert_hipchat==1.6.1,cabot_alert_twilio==1.1.4,cabot_alert_email==1.3.1',
-  $www_hostname           = $::fqdn,
+  $plugins_enabled = 'cabot_alert_hipchat==1.6.1,cabot_alert_twilio==1.1.4,cabot_alert_email==1.3.1',
+  $www_hostname    = $::fqdn,
 
   # Hipchat
-  $config_hipchat_room_id = undef,
-  $config_hipchat_api_key = undef,
+  $hipchat_room_id = undef,
+  $hipchat_api_key = undef,
+
+  # Jenkins
+  $jenkins_api  = undef,
+  $jenkins_user = undef,
+  $jenkins_pass = undef,
 
   # SMTP
-  $config_smtp_host = undef,
-  $config_smtp_port = undef,
-  $config_smtp_username = undef,
-  $config_smtp_password = undef,
+  $smtp_host     = undef,
+  $smtp_port     = undef,
+  $smtp_username = undef,
+  $smtp_password = undef,
+
+  # Twilio
+  $twilio_account_sid     = undef,
+  $twilio_auth_token      = undef,
+  $twilio_outgoing_number = undef,
 
   # Sensu
-  $sensu_port = '3030',
+  $sensu_port   = undef,  # Integer !
+  $sensu_host   = undef,
+  $sensu_debug  = undef, # True/False ?
 
-  # Flapjack
-
+  # Alert Interval
+  $notification_interval = undef, # Standard 120 minutes (WARNING)
+  $alert_interval        = undef, # Standard 10 minutes  (ERROR/CRITICAL)
 ) inherits cabot::params {
   # Sub-classes
   contain cabot::postgres

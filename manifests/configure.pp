@@ -39,25 +39,53 @@ class cabot::configure inherits ::cabot {
   }
 
   # Configuration TEMPLATE
-  $config_env_dir       = $env_dir
-  $config_port          = $port
-  $config_timezone      = $timezone
-  $config_admin_address = $admin_address
-  $config_django_secret = $django_secret
+  $config_env_dir             = $env_dir
+  $config_port                = $port
+  $config_timezone            = $timezone
+  $config_admin_address       = $admin_address
+  $config_django_secret       = $django_secret
 
-  $config_db_username = $db_username
-  $config_db_password = $db_password
-  $config_db_hostname = $db_hostname
-  $config_db_port     = $db_port
-  $config_db_database = $db_database
+  $config_db_username         = $db_username
+  $config_db_password         = $db_password
+  $config_db_hostname         = $db_hostname
+  $config_db_port             = $db_port
+  $config_db_database         = $db_database
 
-  $config_redis_hostname = $redis_hostname
-  $config_redis_port     = $redis_port
-  $config_redis_database = $redis_database
+  $config_redis_hostname      = $redis_hostname
+  $config_redis_port          = $redis_port
+  $config_redis_database      = $redis_database
 
-  $config_graphite_host     = "http://${graphiteweb_host}:${graphiteweb_port}/"
-  $config_graphite_username = $graphite_username
-  $config_graphite_password = $graphite_password
+  $config_plugins_enabled     = $plugins_enabled
+
+  $config_graphite_host       = "http://${graphiteweb_host}:${graphiteweb_port}/"
+  $config_graphite_username   = $graphite_username
+  $config_graphite_password   = $graphite_password
+  $config_graphite_from       = $graphite_from
+
+  $config_hipchat_room_id     = $hipchat_room_id
+  $config_hipchat_api_key     = $hipchat_api_key
+
+  $config_jenkins_api         = $jenkins_api
+  $config_jenkins_user        = $jenkins_user
+  $config_jenkins_pass        = $jenkins_pass
+
+  $config_smtp_host           = $smtp_host
+  $config_smtp_port           = $smtp_port
+  $config_smtp_username       = $smtp_username
+  $config_smtp_password       = $smtp_password
+
+  $config_twilio_account_sid     = $twilio_account_sid
+  $config_twilio_auth_token      = $twilio_auth_token
+  $config_twilio_outgoing_number = $twilio_outgoing_number
+
+  $config_www_hostname       = $www_hostname
+
+  $config_sensu_port         = $sensu_port
+  $config_sensu_host         = $sensu_host
+  $config_sensu_debug        = $sensu_debug
+
+  $config_notification_interval = $notification_interval
+  $config_alert_interval        = $alert_interval
 
   file { "${env_dir}/conf/${ENV}.env":
     ensure  => 'file',
