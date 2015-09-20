@@ -53,7 +53,7 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
         :check_type           => object["check_type"],
         :value                => object["value"],
         :expected_num_hosts   => object["expected_num_hosts"].to_s,
-        :expected_num_metrics => object["expected_num_metrics"].to_s,
+        :allowed_num_failures => object["allowed_num_failures"].to_s,
         :ensure               => :present
       }
     end
@@ -74,7 +74,7 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
       :check_type           => resource[:check_type],
       :value                => resource[:value],
       :expected_num_hosts   => resource[:expected_num_hosts],
-      :expected_num_metrics => resource[:expected_num_metrics],
+      :allowed_num_failures => resource[:allowed_num_failures],
     }
     
 #    Puppet.debug "POST graphite_checks/ PARAMS = "+params.inspect
@@ -105,7 +105,7 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
       :check_type           => resource[:check_type],
       :value                => resource[:value],
       :expected_num_hosts   => resource[:expected_num_hosts],
-      :expected_num_metrics => resource[:expected_num_metrics],
+      :allowed_num_failures => resource[:allowed_num_failures],
     }
  
 #    Puppet.debug "PUT graphite_checks/#{id}/ PARAMS = "+params.inspect

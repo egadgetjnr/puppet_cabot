@@ -45,7 +45,7 @@ Puppet::Type.newtype(:cabot_graphite_check) do
     desc "Minimum number of hosts (data series) expected"
   end
   
-  newproperty(:expected_num_metrics) do
-    desc "Minimum number of metrics expected to satisfy the condition"
+  newproperty(:allowed_num_failures) do
+    desc "Maximum number of metrics that can fail the condition"
   end
 end
