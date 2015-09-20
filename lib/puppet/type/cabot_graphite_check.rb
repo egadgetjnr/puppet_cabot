@@ -43,13 +43,16 @@ Puppet::Type.newtype(:cabot_graphite_check) do
   
   newproperty(:expected_num_hosts) do
     desc "Minimum number of hosts (data series) expected"
+    defaultto 0
   end
   
   newproperty(:expected_num_metrics) do
     desc "Not used. Only here for backwards compatibility with exported resources. Should be removed..."
+    defaultto 0
   end
   
   newproperty(:allowed_num_failures) do
     desc "Maximum number of metrics that can fail the condition"
+    defaultto 0
   end
 end

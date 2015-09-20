@@ -54,6 +54,7 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
         :value                => object["value"],
         :expected_num_hosts   => object["expected_num_hosts"].to_s,
         :allowed_num_failures => object["allowed_num_failures"].to_s,
+        :expected_num_metrics => 0, # LEGACY
         :ensure               => :present
       }
     end
