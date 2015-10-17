@@ -6,7 +6,7 @@ rescue LoadError => e
   Puppet.info "Cabot Puppet module requires 'rest-client' and 'json' ruby gems."
 end
 
-class Puppet::Provider::Rest < Puppet::Provider
+class Puppet::Provider::CabotRest < Puppet::Provider
   desc "Cabot API REST calls"
   
   confine :feature => :json

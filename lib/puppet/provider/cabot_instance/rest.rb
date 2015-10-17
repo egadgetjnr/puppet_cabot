@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), '..', 'cabot_rest')
 
-Puppet::Type.type(:cabot_instance).provide :rest, :parent => Puppet::Provider::Rest do
+Puppet::Type.type(:cabot_instance).provide :rest, :parent => Puppet::Provider::CabotRest do
   desc "REST provider for Cabot Instance"
   
   mk_resource_methods
