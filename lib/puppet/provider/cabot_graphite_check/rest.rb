@@ -29,6 +29,7 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
     rescue => e
       raise LoadError, "Unable to prefetch graphite_checks - "+e.message
     end
+    
     if checks != nil
       checks.each do |check|
 #        Puppet.debug "Graphite Check FOUND. ID = "+check["id"].to_s
@@ -113,7 +114,8 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
       :allowed_num_failures => resource[:allowed_num_failures],
     }
  
-#    Puppet.debug "PUT graphite_checks/#{id}/ PARAMS = "+params.inspect
+    # DEBUG - not updating if metric changes?
+    Puppet.debug "PUT graphite_checks/#{id}/ PARAMS = "+params.inspect
     response = self.class.http_put("graphite_checks/#{id}/", params) # Trailing / is important !!
   end
 end
