@@ -23,8 +23,13 @@ Puppet::Type.type(:cabot_instance).provide :rest, :parent => Puppet::Provider::C
 
   def self.instances
     result = Array.new
-        
-    instances = get_objects('instances')
+
+    begin
+      instances = get_objects('instances')
+    rescue => e
+      raise LoadError, "Unable to prefetch instances - "+e.message
+    end
+
     if instances != nil
       instances.each do |instance|
 #        Puppet.debug "Instance FOUND. ID = "+instance["id"].to_s

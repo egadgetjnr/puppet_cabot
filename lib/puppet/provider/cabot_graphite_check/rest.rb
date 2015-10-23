@@ -114,8 +114,7 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
       :allowed_num_failures => resource[:allowed_num_failures],
     }
  
-    # DEBUG - not updating if metric changes?
-    Puppet.debug "PUT graphite_checks/#{id}/ PARAMS = "+params.inspect
+    #Puppet.debug "PUT graphite_checks/#{id}/ PARAMS = "+params.inspect
     response = self.class.http_put("graphite_checks/#{id}/", params) # Trailing / is important !!
   end
 end

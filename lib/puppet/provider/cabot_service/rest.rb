@@ -23,8 +23,13 @@ Puppet::Type.type(:cabot_service).provide :rest, :parent => Puppet::Provider::Ca
 
   def self.instances
     result = Array.new
-        
-    services = get_objects('services')
+
+    begin
+      services = get_objects('services')
+    rescue => e
+      raise LoadError, "Unable to prefetch services - "+e.message
+    end
+
     if services != nil
       services.each do |service|
 #        Puppet.debug "Service FOUND. ID = "+service["id"].to_s
