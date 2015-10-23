@@ -23,8 +23,12 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
 
   def self.instances
     result = Array.new
-        
-    checks = get_objects('graphite_checks')
+    
+    begin
+      checks = get_objects('graphite_checks')
+    rescue => e
+      raise LoadError, "Unable to prefetch graphite_checks - "+e.message
+    end
     if checks != nil
       checks.each do |check|
 #        Puppet.debug "Graphite Check FOUND. ID = "+check["id"].to_s
