@@ -87,12 +87,13 @@ class cabot::configure inherits ::cabot {
   $config_notification_interval = $notification_interval
   $config_alert_interval        = $alert_interval
 
+  $config_db_days_to_retain     = $db_days_to_retain
+
   file { "${env_dir}/conf/${ENV}.env":
     ensure  => 'file',
     content => template('cabot/environment.env.erb'),
     require => File["${env_dir}/conf"]
   }
-
 
   # Installation
   exec { 'cabot install':

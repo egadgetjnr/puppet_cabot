@@ -99,6 +99,10 @@ class cabot (
   # Alert Interval
   $notification_interval = undef, # Standard 120 minutes (WARNING)
   $alert_interval        = undef, # Standard 10 minutes  (ERROR/CRITICAL)
+
+  # Custom Config - Celery Tasks
+    # Only retain historical data for x days
+  $db_days_to_retain     = 60, # Defaults to 60 in original code
 ) inherits cabot::params {
   # Sub-classes
   contain cabot::postgres

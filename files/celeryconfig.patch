@@ -1,0 +1,18 @@
+--- cabot/celeryconfig.py	2015-07-03 15:49:30.258301779 +0300
++++ celeryconfig.py.new	2015-10-23 13:21:55.316566125 +0300
+@@ -8,6 +8,7 @@
+ CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
+ CELERYD_TASK_SOFT_TIME_LIMIT = 120
+ CELERYD_TASK_TIME_LIMIT = 150
++DAYS_TO_RETAIN = os.environ['CELERY_CLEAN_DB_DAYS_TO_RETAIN'] || 60
+ 
+ CELERYBEAT_SCHEDULE = {
+     'run-all-checks': {
+@@ -21,6 +22,7 @@
+     'clean-db': {
+         'task': 'cabot.cabotapp.tasks.clean_db',
+         'schedule': timedelta(seconds=60*60*24),
++	'args': (DAYS_TO_RETAIN),
+     },
+ }
+ 

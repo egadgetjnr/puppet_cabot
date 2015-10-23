@@ -73,4 +73,18 @@ class cabot::install inherits ::cabot {
     provider => git,
     source   => $git_url,
   }
+  ->
+  # Patching code to allow custom param for cleaning up the history
+  file { "${source_dir}/celeryconfig.patch":
+    ensure  => present,
+    source  => 'puppet:///modules/cabot/celeryconfig.patch',
+  }
+
+  exec { 'Patch celeryconfig.py':
+    command     => "/usr/bin/patch -p0 < ${source_dir}/celeryconfig.patch",
+    cwd         => $source_dir,
+    require     => File["${source_dir}/celeryconfig.patch"],
+    subscribe   => Vcsrepo[$source_dir],
+    refreshonly => true,
+  }
 }
