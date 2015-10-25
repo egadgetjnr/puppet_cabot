@@ -24,12 +24,7 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
   def self.instances
     result = Array.new
     
-    begin
-      checks = get_objects('graphite_checks')
-    rescue => e
-      raise LoadError, "Unable to prefetch graphite_checks - "+e.message
-    end
-    
+    checks = get_objects('graphite_checks')
     if checks != nil
       checks.each do |check|
 #        Puppet.debug "Graphite Check FOUND. ID = "+check["id"].to_s
@@ -68,8 +63,14 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
   # TYPE SPECIFIC        
   private
   def createCheck
-#    Puppet.debug "Create Graphite Check "+resource[:name]
+    Puppet.debug "Create Graphite Check "+resource[:name]
 
+    # 1. REST interface is not always available (prefetch can fail and Puppet < 4.0.0 ignores any exceptions)
+    # 2. Cabot does not verify the name, does not enforce it is unique
+    if !checkNameUnique('graphite_checks', resource[:name])
+      raise "Prefetch probably failed. Trying to create graphite check #{resource[:name]}, but it already exists!"
+    end
+      
     params = {
       :name                 => resource[:name],
       :active               => resource[:active],
@@ -88,7 +89,7 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
   end
 
   def deleteCheck
-#    Puppet.debug "Delete Graphite Check "+resource[:name]
+    Puppet.debug "Delete Graphite Check "+resource[:name]
 
     id = self.class.genericLookup('graphite_checks', 'name', resource[:name], 'id')
       
@@ -97,7 +98,7 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
   end
       
   def updateCheck
-#    Puppet.debug "Update Graphite Check "+resource[:name]
+    Puppet.debug "Update Graphite Check "+resource[:name]
       
     id = self.class.genericLookup('graphite_checks', 'name', resource[:name], 'id')
       

@@ -24,12 +24,7 @@ Puppet::Type.type(:cabot_service).provide :rest, :parent => Puppet::Provider::Ca
   def self.instances
     result = Array.new
 
-    begin
-      services = get_objects('services')
-    rescue => e
-      raise LoadError, "Unable to prefetch services - "+e.message
-    end
-
+    services = get_objects('services')
     if services != nil
       services.each do |service|
 #        Puppet.debug "Service FOUND. ID = "+service["id"].to_s
@@ -86,6 +81,12 @@ Puppet::Type.type(:cabot_service).provide :rest, :parent => Puppet::Provider::Ca
   private
   def createService
     Puppet.debug "Create Service "+resource[:name]
+      
+    # 1. REST interface is not always available (prefetch can fail and Puppet < 4.0.0 ignores any exceptions)
+    # 2. Cabot does not verify the name, does not enforce it is unique
+    if !checkNameUnique('services', resource[:name])
+      raise "Prefetch probably failed. Trying to create service #{resource[:name]}, but it already exists!"
+    end
       
     users_to_notify = Array.new
     resource[:users].each do |user|

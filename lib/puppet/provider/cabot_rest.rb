@@ -184,4 +184,19 @@ class Puppet::Provider::CabotRest < Puppet::Provider
   
     raise "Could not find "+endpoint+" where "+lookupVar+" = "+lookupVal.to_s
   end  
+  
+  # return true if name does not yet exist
+  def self.checkNameUnique(endpoint, name)
+    list = get_objects(endpoint)
+           
+    if list != nil
+      list.each do |object|
+        if object['name'] == name
+          return false
+        end        
+      end
+    end
+  
+    return true
+  end  
 end
