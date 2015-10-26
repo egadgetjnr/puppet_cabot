@@ -78,7 +78,7 @@ Puppet::Type.type(:cabot_instance).provide :rest, :parent => Puppet::Provider::C
 
     # 1. REST interface is not always available (prefetch can fail and Puppet < 4.0.0 ignores any exceptions)
     # 2. Cabot does not verify the name, does not enforce it is unique
-    if !checkNameUnique('instances', resource[:name])
+    if !self.class.checkNameUnique('instances', resource[:name])
       raise "Prefetch probably failed. Trying to create instance #{resource[:name]}, but it already exists!"
     end
 

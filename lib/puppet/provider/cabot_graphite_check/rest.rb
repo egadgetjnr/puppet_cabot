@@ -67,7 +67,7 @@ Puppet::Type.type(:cabot_graphite_check).provide :rest, :parent => Puppet::Provi
 
     # 1. REST interface is not always available (prefetch can fail and Puppet < 4.0.0 ignores any exceptions)
     # 2. Cabot does not verify the name, does not enforce it is unique
-    if !checkNameUnique('graphite_checks', resource[:name])
+    if !self.class.checkNameUnique('graphite_checks', resource[:name])
       raise "Prefetch probably failed. Trying to create graphite check #{resource[:name]}, but it already exists!"
     end
       
