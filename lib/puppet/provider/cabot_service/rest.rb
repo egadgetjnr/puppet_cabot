@@ -69,7 +69,7 @@ Puppet::Type.type(:cabot_service).provide :rest, :parent => Puppet::Provider::Ca
         :alerts_enabled   => object["alerts_enabled"],
         :status_checks    => status_checks,
         :alerts           => alerts,
-#        :hackpad_id       => object["hackpad_id"],
+        :hackpad_id       => object["hackpad_id"],
         :url              => object["url"],          
         :instances        => instances,
         :ensure           => :present
@@ -114,7 +114,7 @@ Puppet::Type.type(:cabot_service).provide :rest, :parent => Puppet::Provider::Ca
       :alerts_enabled   => resource[:alerts_enabled],
       :status_checks    => status_checks,
       :alerts           => alerts,
-#      :hackpad_id       => resource[:hackpad_id],
+      :hackpad_id       => resource[:hackpad_id],
       :url              => resource[:url],       
       :instances        => instances,
     }
@@ -163,7 +163,7 @@ Puppet::Type.type(:cabot_service).provide :rest, :parent => Puppet::Provider::Ca
       :alerts_enabled   => resource[:alerts_enabled],
       :status_checks    => status_checks,
       :alerts           => alerts,
-#      :hackpad_id       => resource[:hackpad_id],
+      :hackpad_id       => resource[:hackpad_id],
       :url              => resource[:url],       
       :instances        => instances,
     }

@@ -25,9 +25,9 @@ Puppet::Type.newtype(:cabot_instance) do
     desc "List of alert methods to enable"
   end
   
-#  newproperty(:hackpad_id) do
-#    desc "A URL for more information on how to resolve the issue?"
-#  end
+  newproperty(:hackpad_id) do
+    desc "A URL for more information on how to resolve the issue?"
+  end
   
   newproperty(:address) do
     desc "The instance IP/Hostname"
