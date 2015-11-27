@@ -157,8 +157,12 @@ class cabot::configure inherits ::cabot {
     path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
   }
 
-  # FAILING !!! TODO    $procfile = "${source_dir}/Procfile"
-  $procfile = "${source_dir}/Procfile.dev"
+  if ($environment == 'development') {
+    $procfile = "${source_dir}/Procfile.dev"
+  } else {
+    $procfile = "${source_dir}/Procfile"
+  }
+  
   $env_file = "${env_dir}/conf/${ENV}.env"
   $template = "${source_dir}/upstart"
   $user = 'root'  # TODO .?.
