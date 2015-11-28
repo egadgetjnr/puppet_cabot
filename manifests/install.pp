@@ -36,7 +36,7 @@ class cabot::install inherits ::cabot {
 
   # Other Packages
     # Distro  
-  package { 'postgresql':
+  package { ['postgresql', 'node-less']:
     ensure => 'installed',
   }
   ->
@@ -47,19 +47,14 @@ class cabot::install inherits ::cabot {
   package { ['libpq-dev', 'libldap2-dev', 'libsasl2-dev']:
     ensure => 'installed',
   }
-  
-  # TODO BUGFIX ??? less@1.3
-  package { 'less':
-    ensure => 'installed',# NPM package ??
-  }
-  
+    
     # Gems
   package { 'foreman':
     provider => 'gem',
   }
 
     # NPM (http://registry.npmjs.org)
-  package { 'coffee-script':
+  package { ['coffee-script', 'less']:
     ensure   => 'present',
     provider => 'npm',
   }
