@@ -36,7 +36,7 @@ class cabot::install inherits ::cabot {
 
   # Other Packages
     # Distro  
-  package { ['postgresql', 'node-less']:
+  package { 'postgresql':
     ensure => 'installed',
   }
   ->
