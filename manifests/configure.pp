@@ -96,8 +96,9 @@ class cabot::configure inherits ::cabot {
   }
 
   # Installation
+  # First install can be a minute or more, sequential installs are fast (packages downloaded already)
   exec { 'cabot install':
-    command     => "${foreman_run} ${env_dir}/bin/pip install --timeout=60 --editable ${source_dir} --exists-action=w",
+    command     => "${foreman_run} ${env_dir}/bin/pip install --timeout=300 --editable ${source_dir} --exists-action=w",
     cwd         => $env_dir,
     subscribe   => File["${env_dir}/conf/${ENV}.env"],
     refreshonly => true,
