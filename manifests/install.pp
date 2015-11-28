@@ -32,46 +32,46 @@ class cabot::install inherits ::cabot {
     # puppetlabs/nodejs
     if ($install_nodejs) {
       include ::nodejs
-
-      #TODO add to nodejs profile
-      # BUG in 0.7.1 on Ubuntu 12.04 ??
-      # NOT REQUIRED on Ubuntu 14.04 !!!
-#    package { 'npm':
-#      ensure  => present,
-#      require => Anchor['nodejs::repo']
-#    }
     }
 
   # Other Packages
+    # Distro  
+  package { 'postgresql':
+    ensure => 'installed',
+  }
+  ->
+  package { 'python-psycopg2':
+    ensure => 'installed',
+  }
+  ->
+  package { ['libpq-dev', 'libldap2-dev', 'libsasl2-dev']:
+    ensure => 'installed',
+  }
+  
+  # TODO BUGFIX ??? less@1.3
+  package { 'less':
+    ensure => 'installed',# NPM package ??
+  }
+  
+    # Gems
   package { 'foreman':
     provider => 'gem',
   }
 
-  #Package['npm'] ->   # NOT REQUIRED on Ubuntu 14.04 !!!
-  package { ['coffee-script']:  # TODO keeps updating:    'less@1.3'
+    # NPM (http://registry.npmjs.org)
+  package { 'coffee-script':
     ensure   => 'present',
     provider => 'npm',
-  } # http://registry.npmjs.org/
-
-  # TODO !!!
-  #  package { 'postgresql':
-  #    ensure => 'installed',
-  #  }
-  #  ->
-  #  package { 'python-psycopg2':
-  #    ensure => 'installed',
-  #  }
-  #  ->
-  #  package { ['libpq-dev', 'libldap2-dev', 'libsasl2-dev']:
-  #    ensure => 'installed',
-  #  }
+  }
+  
 
   # Get Source Code
   # puppetlabs/vcsrepo
   vcsrepo { $source_dir:
-    ensure   => present,  # TODO pin/update !! PARAM!
+    ensure   => $source_ensure,
     provider => git,
     source   => $git_url,
+    revision => $source_version,
   }
   ->
   # Patching code to allow custom param for cleaning up the history

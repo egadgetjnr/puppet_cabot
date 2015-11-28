@@ -97,7 +97,7 @@ class cabot::configure inherits ::cabot {
 
   # Installation
   exec { 'cabot install':
-    command     => "${foreman_run} ${env_dir}/bin/pip install --timeout=30 --editable ${source_dir} --exists-action=w",
+    command     => "${foreman_run} ${env_dir}/bin/pip install --timeout=60 --editable ${source_dir} --exists-action=w",
     cwd         => $env_dir,
     subscribe   => File["${env_dir}/conf/${ENV}.env"],
     refreshonly => true,
@@ -176,9 +176,10 @@ class cabot::configure inherits ::cabot {
     notify      => Service['cabot'],
   }
 
+  Exec['cabot init-script']
+  ->
   service { 'cabot':
     ensure => running,
     # provider => upstart,
-    require => Exec['cabot init-script'],
   }
 }
