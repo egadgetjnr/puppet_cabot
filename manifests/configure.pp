@@ -113,18 +113,9 @@ class cabot::configure inherits ::cabot {
     path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
   }
 
-# FAILS !!!
-#  $create_user_code = "from django.contrib.auth.models import User; User.objects.create_superuser('${django_username}', '${admin_address}', '${django_password}')"
-#  exec { 'cabot create user':
-#    command     => "bash -c '${source_activate}; echo \"${create_user_code}\" | ${foreman_run} ${env_dir}/bin/python manage.py shell'",# PYTHON NORMAL ??
-#    cwd         => $source_dir,
-#    subscribe   => Exec['cabot syncdb'],
-#    refreshonly => true,
-#    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
-#  }
-
-  # TODO MANUAL RUN FOR NOW
-# foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py createsuperuser --username root2 --email nicolas@truyens.com => REQUIRES PASSWORD !!!
+  # TODO - User Creation (not currently possible through Puppet)
+    # foreman run -e /opt/cabot_venv/conf/${ENV}.env /opt/cabot_venv/bin/python manage.py \
+    #   createsuperuser --username root2
 
   exec { 'cabot migrate cabotapp':
     command     => "bash -c '${source_activate}; ${foreman_run} ${env_dir}/bin/python manage.py migrate cabotapp --noinput'",# PYTHON NORMAL ??
@@ -166,7 +157,7 @@ class cabot::configure inherits ::cabot {
   
   $env_file = "${env_dir}/conf/${ENV}.env"
   $template = "${source_dir}/upstart"
-  $user = 'root'  # TODO .?.
+  $user = 'root'  # TODO ??
 
   exec { 'cabot init-script':
     command     => "bash -c 'export HOME=$source_dir; ${foreman} export upstart /etc/init -f ${procfile} -e ${env_file} -u ${user} -a cabot -t ${template}'",
