@@ -13,14 +13,16 @@ class cabot (
   # TODO PARAMS
 
   # Cabot ENV
-  $source_dir    = '/opt/cabot_source',
-  $env_dir       = '/opt/cabot_venv',
-  $environment   = 'development',
-  $foreman       = '/usr/local/bin/foreman',
-  $git_url       = 'https://github.com/arachnys/cabot.git',
-  $port          = '5000',
-  $timezone      = 'Etc/UTC',
-  $log_dir       = '/var/log/cabot',
+  $source_dir     = '/opt/cabot_source',
+  $env_dir        = '/opt/cabot_venv',
+  $environment    = 'development',
+  $foreman        = '/usr/local/bin/foreman',
+  $git_url        = 'https://github.com/arachnys/cabot.git',
+  $port           = '5000',
+  $timezone       = 'Etc/UTC',
+  $log_dir        = '/var/log/cabot',
+  $source_ensure  = 'present',
+  $source_version = 'master',
 
   # Django
   $django_secret = '2FL6ORhHwr5eX34pP9mMugnIOd3jzVuT45f7w430Mt5PnEwbcJgma0q8zUXNZ68A',
@@ -70,6 +72,8 @@ class cabot (
   # Alert Plugins
   $plugins_enabled = 'cabot_alert_hipchat==1.6.1,cabot_alert_twilio==1.1.4,cabot_alert_email==1.3.1',
   $www_hostname    = $::fqdn,
+  
+  # TODO - move the plugin config into a separate definition ! Should be easy enough to modify the config (K=V)
 
   # Hipchat
   $hipchat_room_id = undef,

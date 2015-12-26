@@ -95,8 +95,9 @@ class cabot::configure inherits ::cabot {
   }
 
   # Installation
+  # First install can be a minute or more, sequential installs are fast (packages downloaded already)
   exec { 'cabot install':
-    command     => "${foreman_run} ${env_dir}/bin/pip install --timeout=30 --editable ${source_dir} --exists-action=w",
+    command     => "${foreman_run} ${env_dir}/bin/pip install --timeout=300 --editable ${source_dir} --exists-action=w",
     cwd         => $env_dir,
     subscribe   => File["${env_dir}/conf/${environment}.env"],
     refreshonly => true,
@@ -157,11 +158,16 @@ class cabot::configure inherits ::cabot {
     require     => Package['less'],  # TODO 'less@1.3'
   }
 
-  # FAILING !!! TODO    $procfile = "${source_dir}/Procfile"
-  $procfile = "${source_dir}/Procfile.dev"
+  if ($environment == 'development') {
+    $procfile = "${source_dir}/Procfile.dev"
+  } else {
+    $procfile = "${source_dir}/Procfile"
+  }
+
   $env_file = "${env_dir}/conf/${environment}.env"
+
   $template = "${source_dir}/upstart"
-  $user = 'root'  # TODO .?.
+  $user = 'root'  # TODO ??
 
   exec { 'cabot init-script':
     command     => "bash -c 'export HOME=$source_dir; ${foreman} export upstart /etc/init -f ${procfile} -e ${env_file} -u ${user} -a cabot -t ${template}'",
@@ -172,9 +178,10 @@ class cabot::configure inherits ::cabot {
     notify      => Service['cabot'],
   }
 
+  Exec['cabot init-script']
+  ->
   service { 'cabot':
     ensure => running,
     # provider => upstart,
-    require => Exec['cabot init-script'],
   }
 }
