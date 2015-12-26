@@ -1,0 +1,10 @@
+---
+:backends:
+  - yaml
+:yaml:
+  :datadir: 'spec/fixtures/hiera/hieradata'
+:hierarchy:
+  - "spec/%{::clientcert}"
+  - spec
+  - "%{::clientcert}"
+  - common

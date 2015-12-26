@@ -4,8 +4,7 @@
 #
 class cabot::configure inherits ::cabot {
   # Local Parameters (shorthands)
-  $ENV = $environment
-  $foreman_run = "${foreman} run -e ${env_dir}/conf/${ENV}.env"
+  $foreman_run = "${foreman} run -e ${env_dir}/conf/${environment}.env"
   $source_activate = "source ${env_dir}/bin/activate"
 
 
@@ -89,7 +88,7 @@ class cabot::configure inherits ::cabot {
 
   $config_db_days_to_retain     = $db_days_to_retain
 
-  file { "${env_dir}/conf/${ENV}.env":
+  file { "${env_dir}/conf/${environment}.env":
     ensure  => 'file',
     content => template('cabot/environment.env.erb'),
     require => File["${env_dir}/conf"]
@@ -99,7 +98,7 @@ class cabot::configure inherits ::cabot {
   exec { 'cabot install':
     command     => "${foreman_run} ${env_dir}/bin/pip install --timeout=30 --editable ${source_dir} --exists-action=w",
     cwd         => $env_dir,
-    subscribe   => File["${env_dir}/conf/${ENV}.env"],
+    subscribe   => File["${env_dir}/conf/${environment}.env"],
     refreshonly => true,
   }
 
@@ -123,7 +122,7 @@ class cabot::configure inherits ::cabot {
 #  }
 
   # TODO MANUAL RUN FOR NOW
-# foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py createsuperuser --username root2 --email nicolas@truyens.com => REQUIRES PASSWORD !!!
+  # cd /opt/cabot_source/; foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py createsuperuser --username root2 --email nicolas@truyens.com => REQUIRES PASSWORD !!!
 
   exec { 'cabot migrate cabotapp':
     command     => "bash -c '${source_activate}; ${foreman_run} ${env_dir}/bin/python manage.py migrate cabotapp --noinput'",# PYTHON NORMAL ??
@@ -155,11 +154,12 @@ class cabot::configure inherits ::cabot {
     subscribe   => Exec['cabot collectstatic'],
     refreshonly => true,
     path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
+    require     => Package['less'],  # TODO 'less@1.3'
   }
 
   # FAILING !!! TODO    $procfile = "${source_dir}/Procfile"
   $procfile = "${source_dir}/Procfile.dev"
-  $env_file = "${env_dir}/conf/${ENV}.env"
+  $env_file = "${env_dir}/conf/${environment}.env"
   $template = "${source_dir}/upstart"
   $user = 'root'  # TODO .?.
 

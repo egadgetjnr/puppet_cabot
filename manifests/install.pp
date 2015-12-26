@@ -48,7 +48,7 @@ class cabot::install inherits ::cabot {
   }
 
   #Package['npm'] ->   # NOT REQUIRED on Ubuntu 14.04 !!!
-  package { ['coffee-script']:  # TODO keeps updating:    'less@1.3'
+  package { ['coffee-script', 'less']:  # TODO 'less@1.3'
     ensure   => 'present',
     provider => 'npm',
   } # http://registry.npmjs.org/

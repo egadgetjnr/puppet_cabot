@@ -4,7 +4,16 @@ describe 'cabot class' do
 	describe 'running puppet code' do
     	it 'should work with no errors' do
       		pp = <<-EOS
-      		  class { '::cabot': } 		
+      		  class { '::cabot': 
+              install_postgres       => true,
+              install_postgres_devel => true,
+              install_git            => true,
+              install_ruby           => true,
+              install_python         => true,
+              install_nodejs         => true,
+              install_redis          => true,
+              install_apache         => true,
+      		  } 		
       		EOS
 
       		# Run it twice and test for idempotency
