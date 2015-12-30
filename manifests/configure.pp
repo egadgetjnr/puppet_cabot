@@ -50,6 +50,14 @@ class cabot::configure inherits ::cabot {
   $config_db_port             = $db_port
   $config_db_database         = $db_database
 
+  if ($redis_password != false and $redis_password != undef) {
+    validate_string($redis_password)
+
+    $config_redis_prefix = ":${redis_password}@"
+  } else {
+    $config_redis_prefix = ''
+  }
+
   $config_redis_hostname      = $redis_hostname
   $config_redis_port          = $redis_port
   $config_redis_database      = $redis_database
