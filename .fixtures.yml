@@ -1,39 +1,60 @@
 # Fixtures file hold the dependencies for spec helper
 fixtures:
   forge_modules:
+    # Required
+    vcsrepo:
+      repo: "puppetlabs/vcsrepo"
+      ref: "1.2.0"
+    python:
+      repo: "stankevich/python"
+      ref: "1.9.8"
+    inifile:
+      repo: "puppetlabs/inifile"
+      ref: "1.4.3"    
+    stdlib:
+      repo: "puppetlabs/stdlib"
+      ref: "4.6.0"
+    # Optional
     postgresql:
       repo: "puppetlabs/postgresql"
       ref: "4.3.0"
     gcc:
       repo: "puppetlabs/gcc"
       ref: "0.3.0"
-    stdlib:
-      repo: "puppetlabs/stdlib"
-      ref: "4.6.0"
-    vcsrepo:
-      repo: "puppetlabs/vcsrepo"
-      ref: "1.2.0"
-    python:
-      repo: "stankevich/python"
-      ref: "1.9.4"
-    apache:
-      repo : "puppetlabs/apache"
-      ref: "1.4.1"
-    concat:
-      repo: "puppetlabs/concat"
-      ref: "1.2.2" 
+    git:
+      repo: "puppetlabs/git"
+      ref: "0.3.0" 
+    ruby:
+      repo: "puppetlabs/ruby"
+      ref: "0.4.0"
     nodejs:
       repo: "puppetlabs/nodejs"
       ref: "0.8.0"
-#    yamlfile:
-#      repo: "reidmv/yamlfile"
-#      ref: "0.2.0"
-#    apt:
-#      repo: "puppetlabs/apt"
-#      ref: "1.7.0"
-#  repositories: 
-#    stdlib: git://github.com/puppetlabs/puppetlabs-stdlib.git
-#    yamlfile: git://github.com/reidmv/puppet-module-yamlfile.git
-#    apt: git://github.com/puppetlabs/puppetlabs-apt.git
+    redis:
+      repo: "thomasvandoren/redis"
+      ref: "0.10.0"    
+    apache:
+      repo : "puppetlabs/apache"
+      ref: "1.4.1"
+    logrotate:
+      repo: "rodjek/logrotate"
+      ref: "1.1.1"
+    # Only for testing (or Puppetfile) - dependencies of above modules
+    concat:
+      repo: "puppetlabs/concat"
+      ref: "1.2.2" 
+    apt:
+      repo: "puppetlabs/apt"
+      ref: "1.8.0"   
+    wget:
+      repo: "maestrodev/wget"
+      ref: "1.7.0"  
+    # CentOS only
+    gpg_key:
+      repo: "treydock/gpg_key"   
+      ref: "0.0.3"       
+    epel:
+      repo: "stahnma/epel"   
+      ref: "1.2.2"       
   symlinks:
     cabot: "#{source_dir}"

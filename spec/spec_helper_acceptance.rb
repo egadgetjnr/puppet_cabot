@@ -24,11 +24,12 @@ RSpec.configure do |c|
           on host, puppet('module', 'install', 'puppetlabs-vcsrepo'), { :acceptable_exit_codes => [0,1] }  
           on host, puppet('module', 'install', 'stankevich-python'), { :acceptable_exit_codes => [0,1] }  
           on host, puppet('module', 'install', 'puppetlabs-apache'), { :acceptable_exit_codes => [0,1] }
-          on host, puppet('module', 'install', 'puppetlabs-concat'), { :acceptable_exit_codes => [0,1] }
           on host, puppet('module', 'install', 'puppetlabs-nodejs'), { :acceptable_exit_codes => [0,1] }            
           on host, puppet('module', 'install', 'puppetlabs-git'), { :acceptable_exit_codes => [0,1] }
           on host, puppet('module', 'install', 'puppetlabs-ruby'), { :acceptable_exit_codes => [0,1] }
           on host, puppet('module', 'install', 'thomasvandoren-redis'), { :acceptable_exit_codes => [0,1] }
+          on host, puppet('module', 'install', 'puppetlabs-inifile'), { :acceptable_exit_codes => [0,1] }
+          on host, puppet('module', 'install', 'rodjek-logrotate'), { :acceptable_exit_codes => [0,1] }
 	     end
   	
 		# Install module

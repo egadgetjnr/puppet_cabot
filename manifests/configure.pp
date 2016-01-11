@@ -3,193 +3,171 @@
 # Private class. Only calling cabot main class is supported.
 #
 class cabot::configure inherits ::cabot {
-  # Local Parameters (shorthands)
-  $foreman_run = "${foreman} run -e ${env_dir}/conf/${environment}.env"
-  $source_activate = "source ${env_dir}/bin/activate"
-
-
-  # Create Python VirtualEnv
-  python::virtualenv { $env_dir :
-    ensure       => present,
-    #owner        => 'appuser',
-    #group        => 'apps',
+  # Python Virtual Environment
+  python::virtualenv { $cabot::install_dir :
+    ensure => 'present',
   }
 
 
-  # Bugfixes for Cabot 0.0.1-dev
-  exec { 'cabot 0.0.1-dev bugfix1':
-    command     => "/bin/sed -i '/distribute==/d' ${source_dir}/setup.py",
-    cwd         => $source_dir,
-    subscribe   => Python::Virtualenv[$env_dir],
-    refreshonly => true,
-  } -> Exec['cabot install']
-
-
-  # Setup Log Dir
-  file { $log_dir:
+  # Log Configuration
+  file { $cabot::log_dir:
     ensure  => 'directory',
   }
 
+  if ($cabot::setup_logrotate) {
+    logrotate::rule { 'cabot':
+      path          => "${cabot::log_dir}/*.log",
+      compress      => true,
+      delaycompress => true,
+      rotate        => '12',      # TODO PARAM? - NEEDS TO BE STRING (for now)
+      rotate_every  => 'week',    # TODO PARAM?
+    }
+  }
+  # TODO - future parser when using logrotate::rule ???
+    # Error: Evaluation Error: Error while evaluating a Function Call, Logrotate::Rule[cabot]: rotate must be an integer at /etc/puppetlabs/code/environments/production/modules/logrotate/manifests/rule.pp:306:7 on node ubuntu-14-04
 
-  # Setup Configuration
-  file { "${env_dir}/conf":
+
+  # Configuration
+  $config_dir = "${cabot::install_dir}/conf"
+  Python::Virtualenv[$cabot::install_dir]
+  ->
+  file { $config_dir:
     ensure  => 'directory',
-    require => Python::Virtualenv[$env_dir]
   }
 
-  # Configuration TEMPLATE
-  $config_env_dir             = $env_dir
-  $config_port                = $port
-  $config_timezone            = $timezone
-  $config_admin_address       = $admin_address
-  $config_django_secret       = $django_secret
+  # General Settings
+  $db_url = "postgres://${cabot::db_username}:${cabot::db_password}@${cabot::db_hostname}:${cabot::db_port}/${cabot::db_database}"
 
-  $config_db_username         = $db_username
-  $config_db_password         = $db_password
-  $config_db_hostname         = $db_hostname
-  $config_db_port             = $db_port
-  $config_db_database         = $db_database
-
-  if ($redis_password != false and $redis_password != undef) {
-    validate_string($redis_password)
-
-    $config_redis_prefix = ":${redis_password}@"
+  if ($cabot::redis_password != false and $cabot::redis_password != undef) {
+    validate_string($cabot::redis_password)
+    $redis_prefix = ":${cabot::redis_password}@"
   } else {
-    $config_redis_prefix = ''
+    $redis_prefix = ''
+  }
+  $broker_url = "redis://${redis_prefix}${cabot::redis_hostname}:${cabot::redis_port}/${cabot::redis_database}"
+
+  if ($cabot::callback_scheme == undef or $cabot::callback_url == undef) {
+    $www_scheme = 'http'
+
+    if ($cabot::setup_apache) {
+      $www_http_host = "${cabot::webserver_hostname}:${cabot::webserver_port}"
+    } else {
+      $www_http_host = "${::fqdn}:${cabot::port}"
+    }
+  } else {
+    $www_http_host = $cabot::callback_url
+    $www_scheme = $cabot::callback_scheme
   }
 
-  $config_redis_hostname      = $redis_hostname
-  $config_redis_port          = $redis_port
-  $config_redis_database      = $redis_database
-
-  $config_plugins_enabled     = $plugins_enabled
-
-  $config_graphite_host       = "http://${graphiteweb_host}:${graphiteweb_port}/"
-  $config_graphite_username   = $graphite_username
-  $config_graphite_password   = $graphite_password
-  $config_graphite_from       = $graphite_from
-
-  $config_hipchat_room_id     = $hipchat_room_id
-  $config_hipchat_api_key     = $hipchat_api_key
-
-  $config_jenkins_api         = $jenkins_api
-  $config_jenkins_user        = $jenkins_user
-  $config_jenkins_pass        = $jenkins_pass
-
-  $config_smtp_host           = $smtp_host
-  $config_smtp_port           = $smtp_port
-  $config_smtp_username       = $smtp_username
-  $config_smtp_password       = $smtp_password
-
-  $config_twilio_account_sid     = $twilio_account_sid
-  $config_twilio_auth_token      = $twilio_auth_token
-  $config_twilio_outgoing_number = $twilio_outgoing_number
-
-  $config_www_hostname       = $www_hostname
-
-  $config_sensu_port         = $sensu_port
-  $config_sensu_host         = $sensu_host
-  $config_sensu_debug        = $sensu_debug
-
-  $config_notification_interval = $notification_interval
-  $config_alert_interval        = $alert_interval
-
-  $config_db_days_to_retain     = $db_days_to_retain
-
-  file { "${env_dir}/conf/${environment}.env":
-    ensure  => 'file',
-    content => template('cabot/environment.env.erb'),
-    require => File["${env_dir}/conf"]
+  $configuration = {
+    'VENV'                           => {'value' => $cabot::install_dir},
+    'PORT'                           => {'value' => $cabot::port},
+#    'DEBUG'                          => {'value' => 't'},        # TODO - PARAM ?
+    'LOG_FILE'                       => {'value' => '/dev/null'}, # TODO - PARAM ?
+    'TIME_ZONE'                      => {'value' => $cabot::timezone},
+    'ADMIN_EMAIL'                    => {'value' => $cabot::admin_address},# TODO optional? - defaults to undef
+    'CABOT_FROM_EMAIL'               => {'value' => $cabot::admin_address},# TODO optional? - defaults to undef
+    'DJANGO_SETTINGS_MODULE'         => {'value' => 'cabot.settings'},
+    'DJANGO_SECRET_KEY'              => {'value' => $cabot::django_secret},
+    'DATABASE_URL'                   => {'value' => $db_url},
+    'CELERY_BROKER_URL'              => {'value' => $broker_url},
+    'WWW_HTTP_HOST'                  => {'value' => $www_http_host},
+    'WWW_SCHEME'                     => {'value' => $www_scheme},
+    'NOTIFICATION_INTERVAL'          => {'value' => $cabot::notification_interval},  # $notification_interval
+    'ALERT_INTERVAL'                 => {'value' => $cabot::alert_interval},  # $alert_interval
+    'CELERY_CLEAN_DB_DAYS_TO_RETAIN' => {'value' => $cabot::db_days_to_retain},  # $db_days_to_retain
   }
+  create_resources('cabot::setting', $configuration)
 
-  # Installation
-  # First install can be a minute or more, sequential installs are fast (packages downloaded already)
+  # TODO !!! - Test whether that is the correct exec and how exec should be chained
+  # TODO - Tag should be param
+  File["${cabot::install_dir}/conf"] -> Ini_setting <<| tag == "cabot_${environment}" |>> ~> Exec['cabot install']
+
+
+  # Compilation
+  $config_file = "${cabot::config_dir}/${environment}.env"
+  $path = '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin'
+  $foreman = "foreman run -e ${cabot::config_file}"
+  $activate = "source ${cabot::install_dir}/bin/activate"
+  $manage = "${activate}; ${foreman} ${cabot::install_dir}/bin/python manage.py"
+
+  # Step 1 - Install (downloads dependencies if required)
+  # Timeout was changed to 300 (seconds) to allow downloading on slower links
+  # ALWAYS called if configuration changes # TODO - verify the need for that...
   exec { 'cabot install':
-    command     => "${foreman_run} ${env_dir}/bin/pip install --timeout=300 --editable ${source_dir} --exists-action=w",
-    cwd         => $env_dir,
-    subscribe   => File["${env_dir}/conf/${environment}.env"],
+    command     => "${foreman} ${cabot::install_dir}/bin/pip install --timeout=300 --editable ${cabot::source_dir} --exists-action=w",
+    cwd         => $cabot::install_dir,
     refreshonly => true,
-  }
+    path        => $path,
+  } ~> Exec['cabot syncdb']   # TODO - verify the need for that...
 
-  # DB Setup
+  # Step 2 - Database Sync/Migrate
   exec { 'cabot syncdb':
-    command     => "bash -c '${source_activate}; ${foreman_run} ${env_dir}/bin/python manage.py syncdb --noinput'",# PYTHON NORMAL ??
-    cwd         => $source_dir,
-    subscribe   => Exec['cabot install'],
+    command     => "bash -c '${manage} syncdb --noinput'",# TODO - why bash, why activate, ... => python helpers?
+    cwd         => $cabot::source_dir,
     refreshonly => true,
-    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
-  }
+    path        => $path,
+  } ~> Exec['cabot migrate cabotapp']   # TODO - verify the need for that...
 
-# FAILS !!!
-#  $create_user_code = "from django.contrib.auth.models import User; User.objects.create_superuser('${django_username}', '${admin_address}', '${django_password}')"
-#  exec { 'cabot create user':
-#    command     => "bash -c '${source_activate}; echo \"${create_user_code}\" | ${foreman_run} ${env_dir}/bin/python manage.py shell'",# PYTHON NORMAL ??
-#    cwd         => $source_dir,
-#    subscribe   => Exec['cabot syncdb'],
-#    refreshonly => true,
-#    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
-#  }
-
-  # TODO MANUAL RUN FOR NOW
-  # cd /opt/cabot_source/; foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py createsuperuser --username root2 --email nicolas@truyens.com => REQUIRES PASSWORD !!!
-
+  # Step 3 - Migrations
+  # A - cabotapp
   exec { 'cabot migrate cabotapp':
-    command     => "bash -c '${source_activate}; ${foreman_run} ${env_dir}/bin/python manage.py migrate cabotapp --noinput'",# PYTHON NORMAL ??
-    cwd         => $source_dir,
-    subscribe   => Exec['cabot syncdb'],
+    command     => "bash -c '${manage} migrate cabotapp --noinput'",# TODO - why bash, why activate, ... => python helpers?
+    cwd         => $cabot::source_dir,
     refreshonly => true,
-    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
-  }
+    path        => $path,
+  } ~> Exec['cabot migrate djcelery']   # TODO - verify the need for that...
 
+  # B - djcelery
   exec { 'cabot migrate djcelery':
-    command     => "bash -c '${source_activate}; ${foreman_run} ${env_dir}/bin/python manage.py migrate djcelery --noinput'",# PYTHON NORMAL ??
-    cwd         => $source_dir,
-    subscribe   => Exec['cabot migrate cabotapp'],
+    command     => "bash -c '${manage} migrate djcelery --noinput'",# TODO - why bash, why activate, ... => python helpers?
+    cwd         => $cabot::source_dir,
     refreshonly => true,
-    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
-  }
+    path        => $path,
+  } ~> Exec['cabot collectstatic']   # TODO - verify the need for that...
 
+  # Step 4 - Static Data
   exec { 'cabot collectstatic':
-    command     => "${foreman_run} ${env_dir}/bin/python manage.py collectstatic --noinput",
-    cwd         => $source_dir,
-    subscribe   => Exec['cabot migrate djcelery'],
+    command     => "${foreman} ${cabot::install_dir}/bin/python manage.py migrate collectstatic --noinput'",# TODO - why bash, why activate, ... => python helpers?
+    cwd         => $cabot::source_dir,
     refreshonly => true,
-    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
-  }
+    path        => $path,
+  } ~> Exec['cabot compress']   # TODO - verify the need for that...
 
   exec { 'cabot compress':
-    command     => "${foreman_run} ${env_dir}/bin/python manage.py compress",
-    cwd         => $source_dir,
-    subscribe   => Exec['cabot collectstatic'],
+    command     => "${foreman} ${cabot::install_dir}/bin/python manage.py migrate compress",# TODO - why no bash/activate here ???
+    cwd         => $cabot::source_dir,
     refreshonly => true,
-    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
-    require     => Package['less'],  # TODO 'less@1.3'
+    path        => $path,
   }
 
+  # Step 5 - Init Script
   if ($environment == 'development') {
-    $procfile = "${source_dir}/Procfile.dev"
+    $procfile = "${cabot::source_dir}/Procfile.dev"
   } else {
-    $procfile = "${source_dir}/Procfile"
+    $procfile = "${cabot::source_dir}/Procfile"
   }
-
-  $env_file = "${env_dir}/conf/${environment}.env"
-
-  $template = "${source_dir}/upstart"
-  $user = 'root'  # TODO ??
+  $template = "${cabot::source_dir}/upstart"
 
   exec { 'cabot init-script':
-    command     => "bash -c 'export HOME=$source_dir; ${foreman} export upstart /etc/init -f ${procfile} -e ${env_file} -u ${user} -a cabot -t ${template}'",
-    cwd         => $source_dir,
-    subscribe   => Exec['cabot compress'],
+    command     => "bash -c 'export HOME=${cabot::source_dir}; ${foreman} export upstart /etc/init -f ${procfile} -e ${config_file} -u ${cabot::user} -a cabot -t ${template}'",# TODO -a ??
+    cwd         => $cabot::source_dir,
     refreshonly => true,
-    path        => '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin',
-    notify      => Service['cabot'],
-  }
+    path        => $path,
+  } ~> Service['cabot']   # TODO - makes sense... ?
 
   Exec['cabot init-script']
   ->
   service { 'cabot':
     ensure => running,
-    # provider => upstart,
   }
+
+  # Administrators...
+  # TODO MANUAL RUN FOR NOW:
+  # cd /opt/cabot_source/; foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python /opt/cabot_source/manage.py createsuperuser --username root2 --email ADDRESS
+
+  # Option 1 (FAIL)
+    # $create_user_code = "from django.contrib.auth.models import User; User.objects.create_superuser('root2', 'ADDRESS', 'cabot')"
+    # bash -c '${activate}; echo \"${create_user_code}\" | ${foreman} ${install_dir}/bin/python manage.py shell'
 }
+

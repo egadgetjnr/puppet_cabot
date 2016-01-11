@@ -2,32 +2,21 @@
 #
 # Private class. Only calling cabot main class is supported.
 #
+# MODULE: puppetlabs/postgresql
 class cabot::postgres inherits ::cabot {
-  # TODO MOVE TO MAIN CLASS
-  $listen_addresses           = '*'
-  $ip_mask_allow_all_users    = '0.0.0.0/0'
-
-  # puppetlabs/postgresql
-  if ($install_postgres) {
-	  class { '::postgresql::server':
-	    listen_addresses        => $listen_addresses,
-	    ip_mask_allow_all_users => $ip_mask_allow_all_users,
-	  }
-  }
-
-  # TODO MOVE TO POSTGRES PROFILE
-  if ($install_postgres_devel) {
-    # ONLY ON POSTGRES CLIENT (NOT ON SERVER !!!)
-    class { '::postgresql::lib::devel':
-      link_pg_config => true,           # SERIOUSLY FLAWED WHEN RUNNING SERVER ON 14.04 !!! RATHER NOT INSTALL IT ??
+  # Installation
+  if ($cabot::install_postgres) {
+    class { '::postgresql::server':
+      listen_addresses        => $cabot::postgres_listen,
+      ip_mask_allow_all_users => $cabot::postgres_ip_mask_allow,
     }
   }
 
   # Setup DB
-  if ($setup_db) {
-    postgresql::server::db { $db_database:
-	    user     => $db_username,
-	    password => postgresql_password($db_username, $db_password),
-	  }
+  if ($cabot::setup_db) {
+    postgresql::server::db { $cabot::db_database:
+      user     => $cabot::db_username,
+      password => postgresql_password($cabot::db_username, $cabot::db_password),
+    }
   }
 }

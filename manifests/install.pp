@@ -5,81 +5,97 @@
 class cabot::install inherits ::cabot {
   # Dependencies
     # puppetlabs/gcc
-    if ($install_gcc) {
+    if ($cabot::install_gcc) {
       include ::gcc
     }
 
     # puppetlabs/git
-    if ($install_git) {
+    if ($cabot::install_git) {
       include ::git
     }
 
     # puppetlabs/ruby
-    if ($install_ruby) {
+    if ($cabot::install_ruby) {
       include ::ruby
+
     }
 
-    # stankevich/python
-    if ($install_python) {
-	    class { '::python' :
-	      pip        => true,
-	      dev        => true,
-	      virtualenv => true,
-	      #gunicorn   => false,
-	    }
-	  }
+    # stankevich/python (>= 1.9.8)
+    if ($cabot::install_python) {
+      class { '::python' :
+        pip        => 'present',
+        dev        => 'present',
+        virtualenv => 'present',
+        #gunicorn   => false,
+      }
+    }
 
     # puppetlabs/nodejs
-    if ($install_nodejs) {
+    if ($cabot::install_nodejs) {
       include ::nodejs
     }
 
-  # Other Packages
-    # Distro
-  package { 'postgresql':
-    ensure => 'installed',
-  }
-  ->
-  package { 'python-psycopg2':
-    ensure => 'installed',
-  }
-  ->
-  package { ['libpq-dev', 'libldap2-dev', 'libsasl2-dev']:
-    ensure => 'installed',
-  }
+    # Distro Packages
+    if ($cabot::install_apt_packages) {
+      package { ['postgresql', 'python-psycopg2', 'libpq-dev', 'libldap2-dev', 'libsasl2-dev'] :
+        ensure => 'installed',
+      }
+    }
 
-    # Gems
-  package { 'foreman':
-    provider => 'gem',
-  }
+    # (Ruby) Gem Packages
+    if ($cabot::install_gem_packages) {
+      package { 'foreman':
+        ensure   => 'installed',
+        provider => 'gem',
+      }
+    }
 
-    # NPM (http://registry.npmjs.org)
-  package { ['coffee-script', 'less']:
-    ensure   => 'present',
-    provider => 'npm',
-  }
+    # (NodeJS) NPM Packages
+      # http://registry.npmjs.org
+    if ($cabot::install_npm_packages) {
+      Class['::nodejs']
+      ->
+      package { ['coffee-script', 'less']:
+        ensure   => 'installed',
+        provider => 'npm',
+      }
+    }
 
 
   # Get Source Code
-  # puppetlabs/vcsrepo
-  vcsrepo { $source_dir:
-    ensure   => $source_ensure,
-    provider => git,
-    source   => $git_url,
-    revision => $source_version,
-  }
-  ->
-  # Patching code to allow custom param for cleaning up the history
-  file { "${source_dir}/celeryconfig.patch":
-    ensure  => present,
-    source  => 'puppet:///modules/cabot/celeryconfig.patch',
+    # puppetlabs/vcsrepo
+  vcsrepo { $cabot::source_dir:
+    ensure   => $cabot::version,
+    source   => $cabot::source_url,
+    revision => $cabot::source_revision,
+    provider => 'git',
   }
 
+
+  # Source Code Patch 1 - Allow custom param for cleaning up the history
+  $patch1 = "${cabot::source_dir}/celeryconfig.patch"
+  Vcsrepo[$cabot::source_dir]
+  ->
+  file { $patch1:
+    ensure => 'present',
+    source => 'puppet:///modules/cabot/celeryconfig.patch',
+  }
+
+  File[$patch1]
+  ~>
   exec { 'Patch celeryconfig.py':
-    command     => "/usr/bin/patch -p0 < ${source_dir}/celeryconfig.patch",
-    cwd         => $source_dir,
-    require     => File["${source_dir}/celeryconfig.patch"],
-    subscribe   => Vcsrepo[$source_dir],
+    command     => "/usr/bin/patch -p0 < ${patch1}",
+    cwd         => $cabot::source_dir,
+    refreshonly => true,
+  }
+
+
+  # Bugfix 1 [Cabot 0.0.1-dev]
+  Vcsrepo[$cabot::source_dir]
+  ~>
+  exec { 'cabot 0.0.1-dev bugfix1':
+    cwd         => $cabot::source_dir,
+    command     => "/bin/sed -i '/distribute==/d' ${cabot::source_dir}/setup.py",
     refreshonly => true,
   }
 }

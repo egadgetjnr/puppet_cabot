@@ -10,104 +10,80 @@
 # Sample Usage:
 #
 class cabot (
-  # TODO PARAMS
-
-  # Cabot ENV
-  $source_dir     = '/opt/cabot_source',
-  $env_dir        = '/opt/cabot_venv',
-  $environment    = 'development',
-  $foreman        = '/usr/local/bin/foreman',
-  $git_url        = 'https://github.com/arachnys/cabot.git',
-  $port           = '5000',
-  $timezone       = 'Etc/UTC',
-  $log_dir        = '/var/log/cabot',
-  $source_ensure  = 'present',
-  $source_version = 'master',
-
-  # Django
-  $django_secret = '2FL6ORhHwr5eX34pP9mMugnIOd3jzVuT45f7w430Mt5PnEwbcJgma0q8zUXNZ68A',
-  $django_username = 'root',
-  $django_password = 'cabot',
-  $admin_address = 'admin@example.com',
-
   # PostgreSQL
   $install_postgres       = false,
-  $install_postgres_devel = false,
-  $setup_db               = true,
-  $db_database            = 'cabot',
-  $db_username            = 'cabot',
-  $db_password            = 'cabot',
-  $db_hostname            = 'localhost',
-  $db_port                = '5432',
+  $postgres_listen        = '*',
+  $postgres_ip_mask_allow = '0.0.0.0/0',
+
+  $setup_db    = false,
+  $db_database = 'cabot',
+  $db_username = 'cabot',
+  $db_password = 'cabot',
+  $db_hostname = 'localhost',
+  $db_port     = '5432',
 
   # Install
-  $install_gcc    = true,
+  $install_gcc    = false,
   $install_git    = false,
   $install_ruby   = false,
   $install_python = false,
   $install_nodejs = false,
 
-  # Redis
-  $install_redis      = false,
-  $redis_bind_address = false,
-  $redis_port         = '6379',
-  $redis_password     = false,
-  $redis_tune_max_mem = '1gb',
+  $install_apt_packages = true,
+  $install_gem_packages = true,
+  $install_npm_packages = true,
 
+    # Cabot
+  $user            = 'root',
+  $source_dir      = '/opt/cabot_source',
+  $version         = 'present',
+  $source_url      = 'https://github.com/arachnys/cabot.git',
+  $source_revision = 'master',
+
+  # Configuration
+    # Cabot
+  $install_dir     = '/opt/cabot_venv',
+  $log_dir         = '/var/log/cabot',
+
+  $setup_logrotate = false,
+
+  $environment     = 'development',# TODO - change to production when ready
+  $port            = '5000',
+  $timezone        = 'Etc/UTC',
+  $admin_address   = undef,
+  # Should be changed in production
+  $django_secret   = '2FL6ORhHwr5eX34pP9mMugnIOd3jzVuT45f7w430Mt5PnEwbcJgma0q8zUXNZ68A',
+
+  $callback_scheme = undef,
+  $callback_url    = undef,
+
+    # Alert Parameters
+  $notification_interval = 120, # (minutes) - WARNING
+  $alert_interval        = 10,  # (minutes) - ERROR/CRITICAL
+
+    # Maintenance
+    # Patch 1: Custom config for Celery Task
+  $db_days_to_retain     = 60, # Days to retain historical data, defaults to 60 in original code
+
+    # Redis (Client Only)
   $redis_hostname     = 'localhost',
   $redis_database     = '1',
 
+    # Redis (Client + Server)
+  $redis_port         = '6379',
+  $redis_password     = 'cabotusesredisforocelery',  # This should be changed!
+
+  # Redis (Server)
+  $install_redis      = false,
+  $redis_bind_address = '127.0.0.1',
+  $redis_tune_max_mem = '1gb',
+
   # Webserver
   $install_apache     = false,
-  $setup_apache       = true,
+  $setup_apache       = false,
+  $webserver_hostname = $::fqdn,
   $webserver_port     = 80,
-
-  # Graphite
-  $graphiteweb_host   = $::fqdn,
-  $graphiteweb_port   = '80',
-  $graphite_username  = '',
-  $graphite_password  = '',
-  $graphite_from      = undef,  # Default: -10minute
-
-  # Alert Plugins
-  $plugins_enabled = 'cabot_alert_hipchat==1.6.1,cabot_alert_twilio==1.1.4,cabot_alert_email==1.3.1',
-  $www_hostname    = $::fqdn,
-  
-  # TODO - move the plugin config into a separate definition ! Should be easy enough to modify the config (K=V)
-
-  # Hipchat
-  $hipchat_room_id = undef,
-  $hipchat_api_key = undef,
-
-  # Jenkins
-  $jenkins_api  = undef,
-  $jenkins_user = undef,
-  $jenkins_pass = undef,
-
-  # SMTP
-  $smtp_host     = undef,
-  $smtp_port     = undef,
-  $smtp_username = undef,
-  $smtp_password = undef,
-
-  # Twilio
-  $twilio_account_sid     = undef,
-  $twilio_auth_token      = undef,
-  $twilio_outgoing_number = undef,
-
-  # Sensu
-  $sensu_port   = undef,  # Integer !
-  $sensu_host   = undef,
-  $sensu_debug  = undef, # True/False ?
-
-  # Alert Interval
-  $notification_interval = undef, # Standard 120 minutes (WARNING)
-  $alert_interval        = undef, # Standard 10 minutes  (ERROR/CRITICAL)
-
-  # Custom Config - Celery Tasks
-    # Only retain historical data for x days
-  $db_days_to_retain     = 60, # Defaults to 60 in original code
-) inherits cabot::params {
+) {
   # Sub-classes
   contain cabot::postgres
   contain cabot::install

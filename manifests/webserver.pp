@@ -3,50 +3,51 @@
 # Private class. Only calling cabot main class is supported.
 #
 class cabot::webserver inherits ::cabot {
-  if ($install_apache) {
-    # puppetlabs/apache
+  # puppetlabs/apache
+
+  if ($cabot::install_apache) {
     class { '::apache':
       default_vhost => false,
     }
   }
 
-  if ($setup_apache) {
-	  apache::vhost { 'cabot':
-	    servername          => $::fqdn,
-	    port                => $webserver_port,
+  if ($cabot::setup_apache) {
+    apache::vhost { 'cabot':
+      servername          => $cabot::webserver_hostname,
+      port                => $cabot::webserver_port,
 
-	    manage_docroot      => false,
-	    docroot             => $source_dir,
+      manage_docroot      => false,
+      docroot             => $cabot::source_dir,
 
-	    aliases             => [
+      aliases             => [
         {
-	        alias => '/static/',
-	        path  => "${source_dir}/static/",
+          alias => '/static/',
+          path  => "${cabot::source_dir}/static/",
         },
       ],
 
-	    directories         => [
+      directories         => [
         {
-            path           => '/static/',
-            provider       => 'location',
-            sethandler     => 'None',
-            options        => [ 'All' ],
-            #Apache 2.4 ONLY !! - auth_require   => 'all granted',
-            allow_override => [ 'All' ],
+          path           => '/static/',
+          provider       => 'location',
+          sethandler     => 'None',
+          options        => [ 'All' ],
+          #Apache 2.4 ONLY !! - auth_require   => 'all granted',
+          allow_override => [ 'All' ],
         },
       ],
 
-	    proxy_preserve_host => true,
+      proxy_preserve_host => true,
       proxy_pass          => [
         {
           'path' => '/static',
-          'url'   => '!',
+          'url'  => '!',
         },
         {
           'path' => '/',
-          'url'   => 'http://127.0.0.1:5000/',
+          'url'  => "http://127.0.0.1:${cabot::port}/",
         },
       ],
-	  }
+    }
   }
 }
