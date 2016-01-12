@@ -39,9 +39,12 @@ describe 'cabot::input::jenkins' do
         :password => 'secret',
       } }
             
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_JENKINS_API").with_value('http://jenkins.example.com:80/') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_JENKINS_USER").with_value('user') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_JENKINS_PASS").with_value('secret') }
+      it { should contain_ini_setting("cabot_development_JENKINS_API").with_value('http://jenkins.example.com:80/') }
+      it { should contain_ini_setting("cabot_development_JENKINS_USER").with_value('user') }
+      it { should contain_ini_setting("cabot_development_JENKINS_PASS").with_value('secret') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_JENKINS_API").with_value('http://jenkins.example.com:80/') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_JENKINS_USER").with_value('user') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_JENKINS_PASS").with_value('secret') }
     end
   end
 end

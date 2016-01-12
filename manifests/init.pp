@@ -85,13 +85,15 @@ class cabot (
   $webserver_port     = 80,
 ) {
   # Sub-classes
-  contain cabot::postgres
-  contain cabot::install
-  contain cabot::configure
-  contain cabot::redis
-  contain cabot::webserver
+  include cabot::postgres
+  include cabot::install
+  include cabot::configure
+  include cabot::redis
+  include cabot::webserver
 
   # Dependency Chain
+  Class['::cabot']
+  ->
   Class['cabot::postgres']
   ->
   Class['cabot::install']

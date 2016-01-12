@@ -43,8 +43,9 @@ describe 'cabot::custom_settings', :type => :define do
       } }
       
       it { should contain_cabot__setting('CALENDAR_ICAL_URL') }
-            
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_CALENDAR_ICAL_URL").with_value('http://example.com/rota.ical') }
+      
+      it { should contain_ini_setting("cabot_development_CALENDAR_ICAL_URL").with_value('http://example.com/rota.ical') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_CALENDAR_ICAL_URL").with_value('http://example.com/rota.ical') }
     end      
   end   
 end

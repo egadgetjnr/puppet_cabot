@@ -37,27 +37,29 @@ define cabot::alert_plugin (
     $ensure = 'present'
   }
 
-  if ($version == 'present') {
-    @@ini_subsetting { "cabot_${env}_alert_plugins_${name}":
-      ensure               => $ensure,
-      path                 => "${virtualenv}/conf/${env}.env",
-      setting              => 'CABOT_PLUGINS_ENABLED',
-      subsetting           => "cabot_alert_${name}",
-      key_val_separator    => '==',
-      value                => $version,
-      subsetting_separator => ',',
-      tag                  => "cabot_${env}",# TODO PARAM
-    }
-  } else {
-    @@ini_subsetting { "cabot_${env}_alert_plugins_${name}":
-      ensure               => $ensure,
-      path                 => "${virtualenv}/conf/${env}.env",
-      setting              => 'CABOT_PLUGINS_ENABLED',
-      subsetting           => "cabot_alert_${name}",
-      key_val_separator    => '',
-      value                => '',
-      subsetting_separator => ',',
-      tag                  => "cabot_${env}",# TODO PARAM
-    }
+#  if ($version == 'present') {
+#    @@ini_subsetting { "cabot_${env}_alert_plugins_${name}":
+#      ensure               => $ensure,
+#      path                 => "${virtualenv}/conf/${env}.env",
+#      setting              => 'CABOT_PLUGINS_ENABLED',
+#      subsetting           => "cabot_alert_${name}",
+#      key_val_separator    => '==',
+#      value                => $version,
+#      subsetting_separator => ',',
+#      tag                  => "cabot_${env}",# TODO PARAM
+#    }
+#  } else {
+
+  ini_subsetting { "cabot_${env}_alert_plugins_${name}":
+    ensure               => $ensure,
+    path                 => "${virtualenv}/conf/${env}.env",
+    setting              => 'CABOT_PLUGINS_ENABLED',
+    subsetting           => "cabot_alert_${name}",
+    key_val_separator    => '',
+    value                => '',
+    subsetting_separator => ',',
+    # tag                  => "cabot_${env}",# TODO PARAM
   }
+
+#  }
 }

@@ -3,7 +3,7 @@
 # Private class. Only calling cabot main class is supported.
 #
 # MODULE: puppetlabs/postgresql
-class cabot::postgres inherits ::cabot {
+class cabot::postgres {
   # Installation
   if ($cabot::install_postgres) {
     class { '::postgresql::server':

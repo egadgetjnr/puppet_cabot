@@ -37,10 +37,14 @@ describe 'cabot::input::graphite' do
         :port => 80,
       } }
             
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_API").with_value('http://graph.example.com:80/') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_FROM").with_value('-10min') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_USER").with_ensure('absent') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_PASS").with_ensure('absent') }
+      it { should contain_ini_setting("cabot_development_GRAPHITE_API").with_value('http://graph.example.com:80/') }
+      it { should contain_ini_setting("cabot_development_GRAPHITE_FROM").with_value('-10min') }
+      it { should contain_ini_setting("cabot_development_GRAPHITE_USER").with_ensure('absent') }
+      it { should contain_ini_setting("cabot_development_GRAPHITE_PASS").with_ensure('absent') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_API").with_value('http://graph.example.com:80/') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_FROM").with_value('-10min') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_USER").with_ensure('absent') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_PASS").with_ensure('absent') }
     end
 	  
 	  context "unauth" do	  	    		    
@@ -50,10 +54,14 @@ describe 'cabot::input::graphite' do
         :from => '-1hour',
       } }
 
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_API").with_value('http://graph.example.com:80/') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_FROM").with_value('-1hour') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_USER").with_ensure('absent') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_PASS").with_ensure('absent') }
+      it { should contain_ini_setting("cabot_development_GRAPHITE_API").with_value('http://graph.example.com:80/') }
+      it { should contain_ini_setting("cabot_development_GRAPHITE_FROM").with_value('-1hour') }
+      it { should contain_ini_setting("cabot_development_GRAPHITE_USER").with_ensure('absent') }
+      it { should contain_ini_setting("cabot_development_GRAPHITE_PASS").with_ensure('absent') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_API").with_value('http://graph.example.com:80/') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_FROM").with_value('-1hour') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_USER").with_ensure('absent') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_PASS").with_ensure('absent') }
     end
     
     context "auth" do                 
@@ -64,10 +72,14 @@ describe 'cabot::input::graphite' do
         :password => 'secret',
       } }
 
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_API").with_value('http://graph.example.com:80/') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_FROM").with_value('-10min') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_USER").with_value('user') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_PASS").with_value('secret') }
+      it { should contain_ini_setting("cabot_development_GRAPHITE_API").with_value('http://graph.example.com:80/') }
+      it { should contain_ini_setting("cabot_development_GRAPHITE_FROM").with_value('-10min') }
+      it { should contain_ini_setting("cabot_development_GRAPHITE_USER").with_value('user') }
+      it { should contain_ini_setting("cabot_development_GRAPHITE_PASS").with_value('secret') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_API").with_value('http://graph.example.com:80/') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_FROM").with_value('-10min') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_USER").with_value('user') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_GRAPHITE_PASS").with_value('secret') }
     end    
   end
 end

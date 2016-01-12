@@ -1,4 +1,4 @@
-# Definition: cabot::setting
+# Definition: cabo::setting
 #
 # Wrapper for ini_setting
 #
@@ -13,11 +13,17 @@ define cabot::setting (
   $dir = $::cabot::install_dir
   $env = $::cabot::environment
 
-  @@ini_setting { "cabot_${env}_${name}":
-    ensure  => $ensure,
-    path    => "${dir}/conf/${env}.env",
-    setting => $name,
-    value   => $value,
-    tag     => "cabot_${env}",# TODO PARAM
+  # Exported version: @@ini_setting { "cabot_${env}_${name}":
+  ini_setting { "cabot_${env}_${name}":
+    ensure            => $ensure,
+    path              => "${dir}/conf/${env}.env",
+    key_val_separator => '=',
+    setting           => $name,
+    value             => $value,
+    # Exported version: tag     => "cabot_${env}",# PARAM !!
   }
+
+  # Not for exported version !
+  File["${cabot::install_dir}/conf"] -> Ini_setting["cabot_${env}_${name}"] -> Anchor['cabot_config']
+  Ini_setting["cabot_${env}_${name}"] ~> Service['cabot']
 }

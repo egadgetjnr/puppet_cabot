@@ -2,19 +2,21 @@
 #
 # Private class. Only calling cabot main class is supported.
 #
-class cabot::configure inherits ::cabot {
+class cabot::configure {
   # Python Virtual Environment
   python::virtualenv { $cabot::install_dir :
     ensure => 'present',
   }
 
 
-  # Log Configuration
+  # Logging
   file { $cabot::log_dir:
     ensure  => 'directory',
-  }
+  } -> Exec['cabot init-script']
 
   if ($cabot::setup_logrotate) {
+    File[$cabot::log_dir]
+    ->
     logrotate::rule { 'cabot':
       path          => "${cabot::log_dir}/*.log",
       compress      => true,
@@ -23,17 +25,18 @@ class cabot::configure inherits ::cabot {
       rotate_every  => 'week',    # TODO PARAM?
     }
   }
-  # TODO - future parser when using logrotate::rule ???
-    # Error: Evaluation Error: Error while evaluating a Function Call, Logrotate::Rule[cabot]: rotate must be an integer at /etc/puppetlabs/code/environments/production/modules/logrotate/manifests/rule.pp:306:7 on node ubuntu-14-04
 
 
   # Configuration
   $config_dir = "${cabot::install_dir}/conf"
+  $config_file = "${config_dir}/${cabot::environment}.env"
+
   Python::Virtualenv[$cabot::install_dir]
   ->
   file { $config_dir:
     ensure  => 'directory',
   }
+
 
   # General Settings
   $db_url = "postgres://${cabot::db_username}:${cabot::db_password}@${cabot::db_hostname}:${cabot::db_port}/${cabot::db_database}"
@@ -79,88 +82,112 @@ class cabot::configure inherits ::cabot {
   }
   create_resources('cabot::setting', $configuration)
 
-  # TODO !!! - Test whether that is the correct exec and how exec should be chained
-  # TODO - Tag should be param
-  File["${cabot::install_dir}/conf"] -> Ini_setting <<| tag == "cabot_${environment}" |>> ~> Exec['cabot install']
+  # Collect exported settings (not currently used)
+  # File[$config_dir] -> Ini_setting <<| tag == "cabot_${environment}" |>> -> Anchor['cabot_config']
+  # Ini_setting <<| tag == "cabot_${environment}" |>> ~> Service['cabot']
+  anchor { 'cabot_config': }
 
 
   # Compilation
-  $config_file = "${cabot::config_dir}/${environment}.env"
-  $path = '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin'
-  $foreman = "foreman run -e ${cabot::config_file}"
+  $foreman = "foreman run -e ${config_file}"
   $activate = "source ${cabot::install_dir}/bin/activate"
   $manage = "${activate}; ${foreman} ${cabot::install_dir}/bin/python manage.py"
 
-  # Step 1 - Install (downloads dependencies if required)
-  # Timeout was changed to 300 (seconds) to allow downloading on slower links
-  # ALWAYS called if configuration changes # TODO - verify the need for that...
+  # Bug? - Installing 'foreman' package with 'gem' provider installs foreman in the puppet path on puppet 4, rather than on the system gems path
+  if versioncmp($::puppetversion, '4.0.0') < 0 {
+    # Puppet 3 (?)
+    $path = '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin'
+  } else {
+    # Puppet 4 (?)
+    $path = '/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/opt/puppetlabs/puppet/bin/'
+  }
+
+  # Installation (downloads dependencies if required)
+  Python::Virtualenv[$cabot::install_dir] ~> Exec['cabot install']
+
   exec { 'cabot install':
-    command     => "${foreman} ${cabot::install_dir}/bin/pip install --timeout=300 --editable ${cabot::source_dir} --exists-action=w",
+    command     => "${foreman} ${cabot::install_dir}/bin/pip install --timeout=3600 --editable ${cabot::source_dir} --exists-action=w",
+    timeout     => '3600', # Default: 300
     cwd         => $cabot::install_dir,
     refreshonly => true,
     path        => $path,
-  } ~> Exec['cabot syncdb']   # TODO - verify the need for that...
+    require     => Anchor['cabot_config'],
+  }
 
-  # Step 2 - Database Sync/Migrate
+  # Database Sync and Migrations
+  Exec['cabot install'] ~> Exec['cabot syncdb']
+  #Ini_setting["cabot_${cabot::environment}_LOG_FILE"] ~> Exec['cabot syncdb']
+  Ini_setting["cabot_${cabot::environment}_DATABASE_URL"] ~> Exec['cabot syncdb']
+  #Ini_setting["cabot_${cabot::environment}_CELERY_BROKER_URL"] ~> Exec['cabot syncdb']
+  #Ini_setting["cabot_${cabot::environment}_CELERY_CLEAN_DB_DAYS_TO_RETAIN"] ~> Exec['cabot syncdb']
+  Exec['cabot syncdb'] ~> Exec['cabot migrate cabotapp']
+  Exec['cabot syncdb'] ~> Exec['cabot migrate djcelery']
+
   exec { 'cabot syncdb':
-    command     => "bash -c '${manage} syncdb --noinput'",# TODO - why bash, why activate, ... => python helpers?
-    cwd         => $cabot::source_dir,
-    refreshonly => true,
-    path        => $path,
-  } ~> Exec['cabot migrate cabotapp']   # TODO - verify the need for that...
-
-  # Step 3 - Migrations
-  # A - cabotapp
-  exec { 'cabot migrate cabotapp':
-    command     => "bash -c '${manage} migrate cabotapp --noinput'",# TODO - why bash, why activate, ... => python helpers?
-    cwd         => $cabot::source_dir,
-    refreshonly => true,
-    path        => $path,
-  } ~> Exec['cabot migrate djcelery']   # TODO - verify the need for that...
-
-  # B - djcelery
-  exec { 'cabot migrate djcelery':
-    command     => "bash -c '${manage} migrate djcelery --noinput'",# TODO - why bash, why activate, ... => python helpers?
-    cwd         => $cabot::source_dir,
-    refreshonly => true,
-    path        => $path,
-  } ~> Exec['cabot collectstatic']   # TODO - verify the need for that...
-
-  # Step 4 - Static Data
-  exec { 'cabot collectstatic':
-    command     => "${foreman} ${cabot::install_dir}/bin/python manage.py migrate collectstatic --noinput'",# TODO - why bash, why activate, ... => python helpers?
-    cwd         => $cabot::source_dir,
-    refreshonly => true,
-    path        => $path,
-  } ~> Exec['cabot compress']   # TODO - verify the need for that...
-
-  exec { 'cabot compress':
-    command     => "${foreman} ${cabot::install_dir}/bin/python manage.py migrate compress",# TODO - why no bash/activate here ???
+    command     => "bash -c '${manage} syncdb --noinput'",
     cwd         => $cabot::source_dir,
     refreshonly => true,
     path        => $path,
   }
 
-  # Step 5 - Init Script
-  if ($environment == 'development') {
+  exec { 'cabot migrate cabotapp':
+    command     => "bash -c '${manage} migrate cabotapp --noinput'",
+    cwd         => $cabot::source_dir,
+    refreshonly => true,
+    path        => $path,
+  }
+
+  exec { 'cabot migrate djcelery':
+    command     => "bash -c '${manage} migrate djcelery --noinput'",
+    cwd         => $cabot::source_dir,
+    refreshonly => true,
+    path        => $path,
+  }
+
+  # Static Data
+  Exec['cabot install'] ~> Exec['cabot collectstatic']
+  Exec['cabot install'] ~> Exec['cabot compress']
+
+  exec { 'cabot collectstatic':
+    command     => "${foreman} ${cabot::install_dir}/bin/python manage.py collectstatic --noinput",
+    cwd         => $cabot::source_dir,
+    refreshonly => true,
+    path        => $path,
+  }
+
+  exec { 'cabot compress':
+    command     => "${foreman} ${cabot::install_dir}/bin/python manage.py compress",
+    cwd         => $cabot::source_dir,
+    refreshonly => true,
+    path        => $path,
+  }
+
+
+  # Init Script
+  Python::Virtualenv[$cabot::install_dir] ~> Exec['cabot init-script']
+  Ini_setting["cabot_${cabot::environment}_PORT"] ~> Exec['cabot init-script']
+
+  if ($cabot::environment == 'development') {
     $procfile = "${cabot::source_dir}/Procfile.dev"
   } else {
     $procfile = "${cabot::source_dir}/Procfile"
   }
+
   $template = "${cabot::source_dir}/upstart"
 
   exec { 'cabot init-script':
-    command     => "bash -c 'export HOME=${cabot::source_dir}; ${foreman} export upstart /etc/init -f ${procfile} -e ${config_file} -u ${cabot::user} -a cabot -t ${template}'",# TODO -a ??
+    command     => "bash -c 'export HOME=${cabot::source_dir}; foreman export upstart /etc/init -f ${procfile} -e ${config_file} -u ${cabot::user} -a cabot -t ${template}'",# TODO -a ??
     cwd         => $cabot::source_dir,
     refreshonly => true,
     path        => $path,
-  } ~> Service['cabot']   # TODO - makes sense... ?
+    require     => Anchor['cabot_config'],
+  } ~> Service['cabot']
 
-  Exec['cabot init-script']
-  ->
   service { 'cabot':
-    ensure => running,
+    ensure  => running,
+    require => Exec['cabot init-script'],
   }
+
 
   # Administrators...
   # TODO MANUAL RUN FOR NOW:

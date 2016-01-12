@@ -37,9 +37,12 @@ describe 'cabot::output::hipchat' do
         :api_key => 'myKey',
       } }
 
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_HIPCHAT_URL").with_value('https://api.hipchat.com/v1/rooms/message') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_HIPCHAT_ALERT_ROOM").with_value('alertRoom') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_HIPCHAT_API_KEY").with_value('myKey') }
+      it { should contain_ini_setting("cabot_development_HIPCHAT_URL").with_value('https://api.hipchat.com/v1/rooms/message') }
+      it { should contain_ini_setting("cabot_development_HIPCHAT_ALERT_ROOM").with_value('alertRoom') }
+      it { should contain_ini_setting("cabot_development_HIPCHAT_API_KEY").with_value('myKey') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_HIPCHAT_URL").with_value('https://api.hipchat.com/v1/rooms/message') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_HIPCHAT_ALERT_ROOM").with_value('alertRoom') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_HIPCHAT_API_KEY").with_value('myKey') }
     end    
   end
 end

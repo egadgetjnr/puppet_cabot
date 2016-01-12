@@ -54,18 +54,22 @@ describe 'cabot' do
         it { should contain_logrotate__rule('cabot') }
         it { should contain_file('/opt/cabot_venv/conf') }      
           
-        # Configuration (Collected with helpers/exported_resources.rb)
-        it { expect(exported_resources).to contain_ini_setting("cabot_development_PORT").with_value('5000') }
-        it { expect(exported_resources).to contain_ini_setting("cabot_development_DATABASE_URL").with_value('postgres://cabot:cabot@localhost:5432/cabot') }
-        it { expect(exported_resources).to contain_ini_setting("cabot_development_CELERY_BROKER_URL").with_value('redis://:cabotusesredisforocelery@localhost:6379/1') }
+        # Configuration
+        it { should contain_ini_setting("cabot_development_PORT").with_value('5000') }
+        it { should contain_ini_setting("cabot_development_DATABASE_URL").with_value('postgres://cabot:cabot@localhost:5432/cabot') }
+        it { should contain_ini_setting("cabot_development_CELERY_BROKER_URL").with_value('redis://:cabotusesredisforocelery@localhost:6379/1') }
+        # Collected with helpers/exported_resources.rb
+        # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_PORT").with_value('5000') }
+        # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_DATABASE_URL").with_value('postgres://cabot:cabot@localhost:5432/cabot') }
+        # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_CELERY_BROKER_URL").with_value('redis://:cabotusesredisforocelery@localhost:6379/1') }
         
-        it { should contain_exec('cabot install') }
-        it { should contain_exec('cabot syncdb') }
-        it { should contain_exec('cabot migrate cabotapp') }
-        it { should contain_exec('cabot migrate djcelery') }
-        it { should contain_exec('cabot collectstatic') }
-        it { should contain_exec('cabot compress') }
-        it { should contain_exec('cabot init-script') }
+        it { should contain_exec('cabot install').with_command("foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/pip install --timeout=3600 --editable /opt/cabot_source --exists-action=w") }
+        it { should contain_exec('cabot syncdb').with_command("bash -c 'source /opt/cabot_venv/bin/activate; foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py syncdb --noinput'") }
+        it { should contain_exec('cabot migrate cabotapp').with_command("bash -c 'source /opt/cabot_venv/bin/activate; foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py migrate cabotapp --noinput'") }
+        it { should contain_exec('cabot migrate djcelery').with_command("bash -c 'source /opt/cabot_venv/bin/activate; foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py migrate djcelery --noinput'") }
+        it { should contain_exec('cabot collectstatic').with_command("foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py collectstatic --noinput") }
+        it { should contain_exec('cabot compress').with_command("foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py compress") }
+        it { should contain_exec('cabot init-script').with_command("bash -c 'export HOME=/opt/cabot_source; foreman export upstart /etc/init -f /opt/cabot_source/Procfile.dev -e /opt/cabot_venv/conf/development.env -u root -a cabot -t /opt/cabot_source/upstart'") }
         it { should contain_service('cabot') }
         
       it { should contain_class('cabot::redis') }
@@ -123,10 +127,14 @@ describe 'cabot' do
       it { should contain_logrotate__rule('cabot') }
       it { should contain_file('/opt/cabot_venv/conf') }      
         
-      # Configuration (Collected with helpers/exported_resources.rb)
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_PORT").with_value('5000') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_DATABASE_URL").with_value('postgres://cabot:cabot@localhost:5432/cabot') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_CELERY_BROKER_URL").with_value('redis://:cabotusesredisforocelery@localhost:6379/1') }
+      # Configuration
+      it { should contain_ini_setting("cabot_development_PORT").with_value('5000') }
+      it { should contain_ini_setting("cabot_development_DATABASE_URL").with_value('postgres://cabot:cabot@localhost:5432/cabot') }
+      it { should contain_ini_setting("cabot_development_CELERY_BROKER_URL").with_value('redis://:cabotusesredisforocelery@localhost:6379/1') }
+      # Collected with helpers/exported_resources.rb
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_PORT").with_value('5000') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_DATABASE_URL").with_value('postgres://cabot:cabot@localhost:5432/cabot') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_CELERY_BROKER_URL").with_value('redis://:cabotusesredisforocelery@localhost:6379/1') }
       
       it { should contain_exec('cabot install') }
       it { should contain_exec('cabot syncdb') }

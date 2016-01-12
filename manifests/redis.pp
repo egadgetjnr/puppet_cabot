@@ -2,7 +2,7 @@
 #
 # Private class. Only calling cabot main class is supported.
 #
-class cabot::redis inherits ::cabot {
+class cabot::redis {
   if ($cabot::install_redis) {
     # thomasvandoren/redis
     class { '::redis':

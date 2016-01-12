@@ -2,7 +2,7 @@
 #
 # Private class. Only calling cabot main class is supported.
 #
-class cabot::install inherits ::cabot {
+class cabot::install {
   # Dependencies
     # puppetlabs/gcc
     if ($cabot::install_gcc) {

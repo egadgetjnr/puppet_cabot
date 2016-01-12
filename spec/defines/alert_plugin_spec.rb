@@ -54,10 +54,14 @@ describe 'cabot::alert_plugin', :type => :define do
       it { should contain_cabot__setting('SES_USER') }
       it { should contain_cabot__setting('SES_PASS') }
             
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_SES_HOST").with_value('mail.example.com') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_SES_PORT").with_value(25) }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_SES_USER").with_value('user') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_SES_PASS").with_value('secret') }
+      it { should contain_ini_setting("cabot_development_SES_HOST").with_value('mail.example.com') }
+      it { should contain_ini_setting("cabot_development_SES_PORT").with_value(25) }
+      it { should contain_ini_setting("cabot_development_SES_USER").with_value('user') }
+      it { should contain_ini_setting("cabot_development_SES_PASS").with_value('secret') }              
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_SES_HOST").with_value('mail.example.com') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_SES_PORT").with_value(25) }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_SES_USER").with_value('user') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_SES_PASS").with_value('secret') }
     end    
     
     context "plugin" do              
@@ -87,9 +91,12 @@ describe 'cabot::alert_plugin', :type => :define do
       it { should contain_cabot__setting('SENSU_HOST') }
       it { should contain_cabot__setting('SENSU_DEBUG') }
             
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_SENSU_PORT").with_value('3030') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_SENSU_HOST").with_value('localhost') }
-      it { expect(exported_resources).to contain_ini_setting("cabot_development_SENSU_DEBUG").with_value('False') }    
+      it { should contain_ini_setting("cabot_development_SENSU_PORT").with_value('3030') }
+      it { should contain_ini_setting("cabot_development_SENSU_HOST").with_value('localhost') }
+      it { should contain_ini_setting("cabot_development_SENSU_DEBUG").with_value('False') }                
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_SENSU_PORT").with_value('3030') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_SENSU_HOST").with_value('localhost') }
+      # Exported Resource version - it { expect(exported_resources).to contain_ini_setting("cabot_development_SENSU_DEBUG").with_value('False') }   
     end    
   end   
 end
