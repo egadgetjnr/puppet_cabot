@@ -24,6 +24,6 @@ define cabot::setting (
   }
 
   # Not for exported version !
-  File["${cabot::install_dir}/conf"] -> Ini_setting["cabot_${env}_${name}"] -> Anchor['cabot_config']
+  File["${dir}/conf"] -> Ini_setting["cabot_${env}_${name}"] -> Anchor['cabot_config']
   Ini_setting["cabot_${env}_${name}"] ~> Service['cabot']
 }

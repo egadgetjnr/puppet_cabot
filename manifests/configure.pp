@@ -85,6 +85,10 @@ class cabot::configure {
   # Collect exported settings (not currently used)
   # File[$config_dir] -> Ini_setting <<| tag == "cabot_${environment}" |>> -> Anchor['cabot_config']
   # Ini_setting <<| tag == "cabot_${environment}" |>> ~> Service['cabot']
+
+  # File[$config_dir] -> Ini_subsetting <<| tag == "cabot_${environment}" |>> -> Anchor['cabot_config']
+  # Ini_subsetting <<| tag == "cabot_${environment}" |>> ~> Service['cabot']
+
   anchor { 'cabot_config': }
 
 
@@ -122,6 +126,7 @@ class cabot::configure {
   #Ini_setting["cabot_${cabot::environment}_CELERY_CLEAN_DB_DAYS_TO_RETAIN"] ~> Exec['cabot syncdb']
   Exec['cabot syncdb'] ~> Exec['cabot migrate cabotapp']
   Exec['cabot syncdb'] ~> Exec['cabot migrate djcelery']
+  Exec['cabot syncdb'] ~> Service['cabot']
 
   exec { 'cabot syncdb':
     command     => "bash -c '${manage} syncdb --noinput'",
