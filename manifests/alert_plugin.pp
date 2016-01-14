@@ -24,37 +24,39 @@ define cabot::alert_plugin (
       url        => $url,
       virtualenv => $virtualenv,
     }
-    ~> Exec['cabot syncdb']
+    ~> Exec['cabot install']
   }
 
   # Configuration
   create_resources('cabot::setting', $config)
 
-  # Load plugin in main config  - TODO: Extensive testing (acceptance => need to check end result !!)
-  if ($version == 'absent' or $version == 'present') {
-    $ensure = $version
-    $pin = ''
-    $use_exact_match = true
-  } else {
-    $ensure = 'present'
-    $pin = "==${version}"
-    $use_exact_match = false
-  }
+  # Load plugin in main config (if not a system default)
+  if ! member(['email', 'hipchat', 'twilio'], $name) {
+    if ($version == 'absent' or $version == 'present') {
+      $ensure = $version
+      $pin = ''
+      $use_exact_match = true
+    } else {
+      $ensure = 'present'
+      $pin = "==${version}"
+      $use_exact_match = false
+    }
 
-  # Exported version: @@ini_subsetting { "cabot_${env}_alert_plugins_${name}":
-  ini_subsetting { "cabot_${env}_alert_plugins_${name}":
-    ensure               => $ensure,
-    path                 => "${virtualenv}/conf/${env}.env",
-    key_val_separator    => '=',
-    subsetting_separator => ',',
-    setting              => 'CABOT_PLUGINS_ENABLED',
-    subsetting           => "cabot_alert_${name}",
-    value                => $pin,
-    use_exact_match      => $use_exact_match,
-    # Exported version: tag     => "cabot_${env}",# PARAM !!
-  }
+    # Exported version: @@ini_subsetting { "cabot_${env}_alert_plugins_${name}":
+    ini_subsetting { "cabot_${env}_alert_plugins_${name}":
+      ensure               => $ensure,
+      path                 => "${virtualenv}/conf/${env}.env",
+      key_val_separator    => '=',
+      subsetting_separator => ',',
+      setting              => 'CABOT_PLUGINS_ENABLED',
+      subsetting           => "cabot_alert_${name}",
+      value                => $pin,
+      use_exact_match      => $use_exact_match,
+      # Exported version: tag     => "cabot_${env}",# PARAM !!
+    }
 
-  # Not for exported version !
-  File["${virtualenv}/conf"] -> Ini_subsetting["cabot_${env}_alert_plugins_${name}"] -> Anchor['cabot_config']
-  Ini_subsetting["cabot_${env}_alert_plugins_${name}"] ~> Exec['cabot syncdb']
+    # Not for exported version !
+    File["${virtualenv}/conf"] -> Ini_subsetting["cabot_${env}_alert_plugins_${name}"] -> Anchor['cabot_config']
+    Ini_subsetting["cabot_${env}_alert_plugins_${name}"] ~> Exec['cabot install']
+  }
 }

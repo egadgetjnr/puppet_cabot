@@ -3,6 +3,8 @@
 # Private class. Only calling cabot main class is supported.
 #
 class cabot::configure {
+  anchor { 'cabot_config': }
+
   # Python Virtual Environment
   python::virtualenv { $cabot::install_dir :
     ensure => 'present',
@@ -82,15 +84,15 @@ class cabot::configure {
   }
   create_resources('cabot::setting', $configuration)
 
+  File["${cabot::install_dir}/conf"] -> class { 'cabot::configure::plugins': } -> Anchor['cabot_config']
+  Class['cabot::configure::plugins'] ~> Exec['cabot install']
+
   # Collect exported settings (not currently used)
   # File[$config_dir] -> Ini_setting <<| tag == "cabot_${environment}" |>> -> Anchor['cabot_config']
   # Ini_setting <<| tag == "cabot_${environment}" |>> ~> Service['cabot']
 
   # File[$config_dir] -> Ini_subsetting <<| tag == "cabot_${environment}" |>> -> Anchor['cabot_config']
   # Ini_subsetting <<| tag == "cabot_${environment}" |>> ~> Service['cabot']
-
-  anchor { 'cabot_config': }
-
 
   # Compilation
   $foreman = "foreman run -e ${config_file}"
@@ -120,10 +122,10 @@ class cabot::configure {
 
   # Database Sync and Migrations
   Exec['cabot install'] ~> Exec['cabot syncdb']
-  #Ini_setting["cabot_${cabot::environment}_LOG_FILE"] ~> Exec['cabot syncdb']
+  Ini_setting["cabot_${cabot::environment}_LOG_FILE"] ~> Exec['cabot syncdb']
   Ini_setting["cabot_${cabot::environment}_DATABASE_URL"] ~> Exec['cabot syncdb']
-  #Ini_setting["cabot_${cabot::environment}_CELERY_BROKER_URL"] ~> Exec['cabot syncdb']
-  #Ini_setting["cabot_${cabot::environment}_CELERY_CLEAN_DB_DAYS_TO_RETAIN"] ~> Exec['cabot syncdb']
+  Ini_setting["cabot_${cabot::environment}_CELERY_BROKER_URL"] ~> Exec['cabot syncdb']
+  Ini_setting["cabot_${cabot::environment}_CELERY_CLEAN_DB_DAYS_TO_RETAIN"] ~> Exec['cabot syncdb']
   Exec['cabot syncdb'] ~> Exec['cabot migrate cabotapp']
   Exec['cabot syncdb'] ~> Exec['cabot migrate djcelery']
   Exec['cabot syncdb'] ~> Service['cabot']
