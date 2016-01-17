@@ -15,6 +15,8 @@ describe 'cabot class' do
         install_redis    => true,
         install_apache   => true,
         setup_apache     => true,  
+        admin_password   => 'password',
+        admin_address    => 'cabot@example.com',
       }     
     EOS
   }
@@ -66,6 +68,29 @@ describe 'cabot class' do
     #{alert_section}
     #{config_section}
     #{install_manifest}    
+    EOS
+  }
+  
+  let(:api_manifest1) {
+    <<-EOS
+    class { 'cabot::api': 
+      user     => 'cabot',
+      password => 'password',
+      users    => {
+        1 => 'cabot',
+      }
+    }
+    
+    Class['cabot::api']
+    ->
+    cabot_instance { 'test_instance_1':
+      ensure         => present,
+      users          => ['cabot'],
+      alerts_enabled => true,
+      status_checks  => [],
+      alerts         => ['Hipchat'],
+      address        => '127.0.0.1',
+    }    
     EOS
   }
   
@@ -180,6 +205,17 @@ describe 'cabot class' do
       its(:content) { should match /SENSU_PORT=3030/ }
     end
   end  
+  
+  context 'Setup REST API config for Puppet' do
+    it 'should run api-1 manifest' do
+      # Run without errors
+      apply_manifest(api_manifest1, :catch_failures => true)
+      
+      # Idempotency - no further changes..
+      result = apply_manifest(api_manifest1, :catch_failures => true)
+      expect(result.exit_code).to be_zero
+    end    
+  end
 end
 
 # TODO - Acceptance Testing - Buglist

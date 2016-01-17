@@ -14,11 +14,11 @@ describe 'host1' do
   } }
     
   context "integrated test" do	  
-	it { should compile.with_all_deps }
-	
-	it { should contain_class('cabot') }
-	it { should contain_ini_setting("cabot_development_PORT").with_value('5000') }
-	it { should contain_ini_setting("cabot_development_GRAPHITE_API").with_value('http://localhost:80/') }
-	it { should contain_ini_setting("cabot_development_HIPCHAT_ALERT_ROOM").with_value('myRoom') }
+  	it { should compile.with_all_deps }
+  	
+  	it { should contain_class('cabot') }
+  	it { should contain_ini_setting("cabot_development_PORT").with_value('5000') }
+  	it { should contain_ini_setting("cabot_development_GRAPHITE_API").with_value('http://localhost:80/') }
+  	it { should contain_ini_setting("cabot_development_HIPCHAT_ALERT_ROOM").with_value('myRoom') }
   end
 end

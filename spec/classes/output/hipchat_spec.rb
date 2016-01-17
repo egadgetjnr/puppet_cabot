@@ -17,6 +17,7 @@ describe 'cabot::output::hipchat' do
       install_redis    => true,
       install_apache   => true,
       setup_apache     => true,   
+      admin_password   => 'password',
     }
     "
   ]}

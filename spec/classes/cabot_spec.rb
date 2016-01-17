@@ -16,6 +16,8 @@ describe 'cabot' do
     :install_redis    => true,
     :install_apache   => true,
     :setup_apache     => true,   
+    :admin_password   => 'password',
+    :admin_address    => 'cabot@example.com',
   } }
   
   context "ubuntu" do
@@ -70,6 +72,7 @@ describe 'cabot' do
         it { should contain_exec('cabot collectstatic').with_command("foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py collectstatic --noinput") }
         it { should contain_exec('cabot compress').with_command("foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py compress") }
         it { should contain_exec('cabot init-script').with_command("bash -c 'export HOME=/opt/cabot_source; foreman export upstart /etc/init -f /opt/cabot_source/Procfile.dev -e /opt/cabot_venv/conf/development.env -u root -a cabot -t /opt/cabot_source/upstart'") }
+        it { should contain_exec('cabot admin password').with_command("echo \"from django.contrib.auth.models import User; User.objects.create_superuser('cabot', 'cabot@example.com', 'password')\" | foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python manage.py shell && touch /opt/cabot_source/conf/admin_created") }
         it { should contain_service('cabot') }
         
       it { should contain_class('cabot::redis') }

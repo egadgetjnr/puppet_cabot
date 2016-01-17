@@ -16,7 +16,8 @@ describe 'cabot::output::twilio' do
       setup_logrotate  => true,
       install_redis    => true,
       install_apache   => true,
-      setup_apache     => true,   
+      setup_apache     => true,
+      admin_password   => 'password',
     }
     "
   ]}

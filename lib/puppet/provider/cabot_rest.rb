@@ -18,7 +18,7 @@ class Puppet::Provider::CabotRest < Puppet::Provider
   end
     
   def self.get_rest_info
-    config_file = "/etc/puppet/cabot_api.yaml"
+    config_file = "/etc/cabot/puppet_api.yaml"
     
     data = File.read(config_file) or raise "Could not read setting file #{config_file}"    
     yamldata = YAML.load(data)

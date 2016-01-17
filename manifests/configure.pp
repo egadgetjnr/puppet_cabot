@@ -195,13 +195,13 @@ class cabot::configure {
     require => Exec['cabot init-script'],
   }
 
-
-  # Administrators...
-  # TODO MANUAL RUN FOR NOW:
-  # cd /opt/cabot_source/; foreman run -e /opt/cabot_venv/conf/development.env /opt/cabot_venv/bin/python /opt/cabot_source/manage.py createsuperuser --username root2 --email ADDRESS
-
-  # Option 1 (FAIL)
-    # $create_user_code = "from django.contrib.auth.models import User; User.objects.create_superuser('root2', 'ADDRESS', 'cabot')"
-    # bash -c '${activate}; echo \"${create_user_code}\" | ${foreman} ${install_dir}/bin/python manage.py shell'
+  $createsuperuser = "from django.contrib.auth.models import User; User.objects.create_superuser('${cabot::admin_user}', '${cabot::admin_address}', '${cabot::admin_password}')"
+  exec { 'cabot admin password':
+    command => "echo \"${createsuperuser}\" | ${foreman} ${cabot::install_dir}/bin/python manage.py shell && touch ${cabot::source_dir}/conf/admin_created",
+    cwd     => $cabot::source_dir,
+    path    => $path,
+    require => Exec['cabot migrate cabotapp'],
+    creates => "${cabot::source_dir}/conf/admin_created",
+  }
 }
 

@@ -7,7 +7,9 @@
 #
 # Requires: see Modulefile
 #
-# Sample Usage:
+# === Authors
+#
+# Nicolas Truyens <nicolas@truyens.com>
 #
 class cabot (
   # PostgreSQL
@@ -60,6 +62,10 @@ class cabot (
     # Alert Parameters
   $notification_interval = 120, # (minutes) - WARNING
   $alert_interval        = 10,  # (minutes) - ERROR/CRITICAL
+
+    # Administrator
+  $admin_user = 'cabot',
+  $admin_password,
 
     # Maintenance
     # Patch 1: Custom config for Celery Task

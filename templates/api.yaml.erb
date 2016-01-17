@@ -1,0 +1,9 @@
+---
+ip: "<%= @api_host %>"
+port: "<%= @api_port %>"
+username: "<%= @admin_user %>"
+password: "<%= @admin_password %>"
+users: 
+<% @users_hash.each do |key,val| -%>
+  <%= key %>: <%= val %>
+<% end -%>
