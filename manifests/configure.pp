@@ -23,8 +23,8 @@ class cabot::configure {
       path          => "${cabot::log_dir}/*.log",
       compress      => true,
       delaycompress => true,
-      rotate        => '12',      # TODO PARAM? - NEEDS TO BE STRING (for now)
-      rotate_every  => 'week',    # TODO PARAM?
+      rotate        => $cabot::rotate_count,
+      rotate_every  => $cabot::rotate_every,
     }
   }
 
@@ -64,14 +64,22 @@ class cabot::configure {
     $www_scheme = $cabot::callback_scheme
   }
 
+  # https://docs.python.org/2.4/lib/truth.html
+  if ($cabot::debug) {
+    $debug = 'True'
+  } else {
+    $debug = 'False'
+  }
+
   $configuration = {
     'VENV'                           => {'value' => $cabot::install_dir},
     'PORT'                           => {'value' => $cabot::port},
-#    'DEBUG'                          => {'value' => 't'},        # TODO - PARAM ?
-    'LOG_FILE'                       => {'value' => '/dev/null'}, # TODO - PARAM ?
+    # With DEBUG enabled, there is an error on compress: "Compressor is disabled. Set the COMPRESS_ENABLED setting or use --force to override."
+    #'DEBUG'                          => {'value' => $debug},
+    'LOG_FILE'                       => {'value' => $cabot::log_file},
     'TIME_ZONE'                      => {'value' => $cabot::timezone},
-    'ADMIN_EMAIL'                    => {'value' => $cabot::admin_address},# TODO optional? - defaults to undef
-    'CABOT_FROM_EMAIL'               => {'value' => $cabot::admin_address},# TODO optional? - defaults to undef
+    'ADMIN_EMAIL'                    => {'value' => $cabot::admin_address},
+    'CABOT_FROM_EMAIL'               => {'value' => $cabot::admin_address},
     'DJANGO_SETTINGS_MODULE'         => {'value' => 'cabot.settings'},
     'DJANGO_SECRET_KEY'              => {'value' => $cabot::django_secret},
     'DATABASE_URL'                   => {'value' => $db_url},
@@ -183,7 +191,8 @@ class cabot::configure {
   $template = "${cabot::source_dir}/upstart"
 
   exec { 'cabot init-script':
-    command     => "bash -c 'export HOME=${cabot::source_dir}; foreman export upstart /etc/init -f ${procfile} -e ${config_file} -u ${cabot::user} -a cabot -t ${template}'",# TODO -a ??
+    # foreman help export
+    command     => "bash -c 'export HOME=${cabot::source_dir}; foreman export upstart /etc/init -f ${procfile} -e ${config_file} -u ${cabot::user} -a cabot -t ${template}'",
     cwd         => $cabot::source_dir,
     refreshonly => true,
     path        => $path,

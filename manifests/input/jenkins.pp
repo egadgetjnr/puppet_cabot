@@ -1,17 +1,25 @@
-# Class: cabot::input::jenkins
+# == Class: cabot::input::jenkins
 #
 # Custom Configuration specific for Jenkins input
 #
-# Parameters:
-# TODO
+# === Parameters:
+# * host (string): The Jenkins Hostname
+# * port (integer): The Jenkins Port 
+# * username (string): Username for logging into Jenkins (optional)
+# * password (string): Password for logging into Jenkins (optional)
 #
-# Copyright 2016 - Nicolas Truyens
+# === Authors
+#
+# Nicolas Truyens <nicolas@truyens.com>
+#
 class cabot::input::jenkins (
   $host,
   $port,
   $username,
   $password,
 ) {
+  # TODO - validation
+  
   cabot::custom_settings { 'jenkins':
     config => {
       'JENKINS_API'  => {

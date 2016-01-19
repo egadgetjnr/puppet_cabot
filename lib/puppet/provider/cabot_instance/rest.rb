@@ -56,12 +56,19 @@ Puppet::Type.type(:cabot_instance).provide :rest, :parent => Puppet::Provider::C
       object["alerts"].each do |alert|
         alerts.push genericLookup('alertplugins', 'id', alert, 'title')
       end      
-          
+      
+      alerts_enabled = case 
+      when object["alerts_enabled"]
+        :true
+      else
+        :false
+      end
+      
       {
         :id               => object["id"],
         :name             => object["name"],          
         :users            => users_to_notify,
-        :alerts_enabled   => object["alerts_enabled"],
+        :alerts_enabled   => alerts_enabled,
         :status_checks    => status_checks,
         :alerts           => alerts,
         :hackpad_id       => object["hackpad_id"],

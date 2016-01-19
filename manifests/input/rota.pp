@@ -1,14 +1,19 @@
-# Class: cabot::input::rota
+# == Class: cabot::input::rota
 #
 # Custom Configuration specific for Rotation Schedule
 #
-# Parameters:
-# TODO
+# === Parameters:
+# * url (string): URL to the Google Calender ICAL
 #
-# Copyright 2016 - Nicolas Truyens
+# === Authors
+#
+# Nicolas Truyens <nicolas@truyens.com>
+#
 class cabot::input::rota (
   $url,
 ) {
+  # TODO - validation
+  
   cabot::custom_settings { 'rota':
     config => {
       'CALENDAR_ICAL_URL' => {

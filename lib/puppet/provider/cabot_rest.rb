@@ -1,7 +1,7 @@
 begin
   require 'rest-client' if Puppet.features.rest_client?
   require 'json' if Puppet.features.json?
-  require 'yaml/store' # TODO  
+  require 'yaml/store' if Puppet.features.yaml?
 rescue LoadError => e
   Puppet.info "Cabot Puppet module requires 'rest-client' and 'json' ruby gems."
 end
@@ -10,6 +10,7 @@ class Puppet::Provider::CabotRest < Puppet::Provider
   desc "Cabot API REST calls"
   
   confine :feature => :json
+  confine :feature => :yaml
   confine :feature => :rest_client
   
   def initialize(value={})
@@ -65,13 +66,34 @@ class Puppet::Provider::CabotRest < Puppet::Provider
   end
   
   def self.userLookupByName(name)
-    rest = get_rest_info    
-    rest[:users].key(name)
+    rest = get_rest_info
+    if rest.key?(:users)
+      users = rest[:users]
+        
+      id = users.key(name)
+      if id == nil
+        raise "Users Hash does not contain user #{name}"
+      else
+        users.key(name)
+      end
+    else
+      raise "The configuration file does not contain a users hash."
+    end
   end
   
   def self.userLookupById(id)
     rest = get_rest_info    
-    rest[:users][id]
+    if rest.key?(:users)
+      users = rest[:users]
+      
+      if users.key?(id)
+        users[id]
+      else
+        raise "Users Hash does not contain user with ID = #{id}"
+      end
+    else
+      raise "The configuration file does not contain a users hash."
+    end
   end        
 
   def exists?    

@@ -1,14 +1,16 @@
-# Definition: cabot::custom_settings
+# == Definition: cabot::custom_settings
 #
 # This definition adds extra configuration
 # Required for inputs: Jenkins/HTTP/Graphite
 #
-# Parameters:
-# TODO
+# === Parameters:
+# * config (hash): Config Hash - eg. { 'PARAM_1'  => {'value' => '<VALUE>'},}
 #
-# Copyright 2016 - Nicolas Truyens
+# === Authors
+#
+# Nicolas Truyens <nicolas@truyens.com>
+#
 define cabot::custom_settings (
-  # TODO PARAMS
   $config  = {},
 ) {
   create_resources('cabot::setting', $config)

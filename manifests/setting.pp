@@ -1,11 +1,15 @@
-# Definition: cabo::setting
+# == Definition: cabo::setting
 #
 # Wrapper for ini_setting
 #
-# Parameters:
-# TODO
+# === Parameters:
+# * ensure (string): present/absent. Default: present
+# * value (string): the value to assign
 #
-# Copyright 2016 - Nicolas Truyens
+# === Authors
+#
+# Nicolas Truyens <nicolas@truyens.com>
+#
 define cabot::setting (
   $value,
   $ensure = 'present',

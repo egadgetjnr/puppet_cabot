@@ -15,6 +15,8 @@ Puppet::Type.newtype(:cabot_service) do
 
   newproperty(:alerts_enabled) do
     desc "Whether to enable alerts for this service"
+    newvalues(:true, :false)
+    defaultto :true
   end 
   
   newproperty(:status_checks, :array_matching => :all) do

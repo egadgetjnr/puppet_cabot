@@ -3,9 +3,9 @@
 # This module manages Arachnys Cabot
 #
 # Parameters:
-# TODO
+# TODO PARAMETERS...
 #
-# Requires: see Modulefile
+# Requires: see README
 #
 # === Authors
 #
@@ -31,7 +31,7 @@ class cabot (
   $install_python = false,
   $install_nodejs = false,
 
-  $install_apt_packages = true,
+  $install_dependencies = true,
   $install_gem_packages = true,
   $install_npm_packages = true,
 
@@ -48,11 +48,16 @@ class cabot (
   $log_dir         = '/var/log/cabot',
 
   $setup_logrotate = false,
+  $rotate_every    = 'week',
+  $rotate_count    = '12',
 
-  $environment     = 'development',# TODO - change to production when ready
+  $environment     = 'production',
   $port            = '5000',
+  $debug           = false,
+  $log_file        = '/dev/null',
   $timezone        = 'Etc/UTC',
-  $admin_address   = undef,
+  # REQUIRED
+  $admin_address,
   # Should be changed in production
   $django_secret   = '2FL6ORhHwr5eX34pP9mMugnIOd3jzVuT45f7w430Mt5PnEwbcJgma0q8zUXNZ68A',
 
@@ -65,6 +70,7 @@ class cabot (
 
     # Administrator
   $admin_user = 'cabot',
+  # REQUIRED
   $admin_password,
 
     # Maintenance
@@ -90,6 +96,11 @@ class cabot (
   $webserver_hostname = $::fqdn,
   $webserver_port     = 80,
 ) {
+  # TODO validation
+  
+  
+  
+  
   # Sub-classes
   include cabot::postgres
   include cabot::install

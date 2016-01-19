@@ -34,7 +34,8 @@ class { 'cabot':
   install_redis    => true,
   install_apache   => true,
   setup_apache     => true,
-  admin_password   => 'password',	# Recommended usage: Hiera-ENC
+  admin_password   => 'password',			# Required. Recommended usage: Hiera-ENC
+  admin_address    => 'cabot@example.com',	# Required
 }
 ```
 

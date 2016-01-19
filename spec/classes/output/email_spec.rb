@@ -5,21 +5,7 @@ describe 'cabot::output::email' do
   Puppet::Util::Log.newdestination(:console)
   
   let(:pre_condition) {[
-    "class { 'cabot':
-      install_postgres => true,
-      setup_db         => true,
-      install_gcc      => true,
-      install_git      => true,
-      install_ruby     => true,
-      install_python   => true,
-      install_nodejs   => true,
-      setup_logrotate  => true,
-      install_redis    => true,
-      install_apache   => true,
-      setup_apache     => true,   
-      admin_password   => 'password',
-    }
-    "
+    @cabot_common
   ]}
   
   context "ubuntu" do

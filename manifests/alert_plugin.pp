@@ -1,19 +1,25 @@
-# Definition: cabot::alert_plugin
+# == Definition: cabot::alert_plugin
 #
 # This definition installs a new alert plugin
 #
-# Parameters:
-# TODO
+# === Parameters:
+# * url (string): If your are installing a new plugin, enter the GIT URL
+# * version (string): present/absent or specific version of the plugin (= git tag) - Default: present 
+# * config (hash): Config Hash - eg. { 'PARAM_1'  => {'value' => '<VALUE>'},}
 #
-# Copyright 2016 - Nicolas Truyens
+# === Authors
+#
+# Nicolas Truyens <nicolas@truyens.com>
+#
 define cabot::alert_plugin (
-  # TODO PARAMS
   $url     = undef,
   $version = 'present',
   $config  = {},
 ) {
   $virtualenv = $::cabot::install_dir
   $env = $::cabot::environment
+  
+  # TODO - validation  
 
   # Installation
   if ($url != undef) {
