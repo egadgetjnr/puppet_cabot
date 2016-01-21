@@ -11,7 +11,7 @@ describe 'cabot class' do
         install_ruby     => true,
         install_python   => true,
         install_nodejs   => true,
-        setup_logrotate  => false,    # BUG (1)
+        setup_logrotate  => true,
         install_redis    => true,
         install_apache   => true,
         setup_apache     => true,  
@@ -134,6 +134,20 @@ describe 'cabot class' do
     <<-EOS
     cabot_service { 'test_service_1':
       users => ['non_existing'],
+    }
+    EOS
+  }
+  
+  let (:api_manifest4) {
+    <<-EOS
+    cabot_service { 'test_service_2':
+      ensure         => present,
+      users          => ['cabot'],
+      alerts_enabled => false,
+      status_checks  => [],
+      alerts         => ['Hipchat'],
+      url            => 'http://www.example.com',
+      instances      => ['test_instance_1'],
     }
     EOS
   }
@@ -295,9 +309,15 @@ describe 'cabot class' do
       result = apply_manifest(api_manifest3, :catch_failures => false)
       expect(result.stderr).to match /.*Users Hash does not contain.*/      
     end
+    
+    it 'should run api-4 manifest' do
+      # Run without errors
+      result = apply_manifest(api_manifest4, :catch_failures => true)
+      expect(result.exit_code).not_to eq(0)
+            
+      # Idempotency - no further changes..
+      result = apply_manifest(api_manifest4, :catch_failures => true)
+      expect(result.exit_code).to be_zero
+    end
   end
 end
-
-# TODO - Acceptance Testing - BUG (1): Logrotate on Puppet 4 (Future Parser)
-  # rotate must be an integer => when rotate is an actual integer
-  # FIX: set rotate as string

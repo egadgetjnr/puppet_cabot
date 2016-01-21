@@ -25,7 +25,7 @@ unless ENV['BEAKER_provision'] == 'no'
     on host, puppet('module', 'install', 'puppetlabs-ruby'), { :acceptable_exit_codes => [0,1] }
     on host, puppet('module', 'install', 'thomasvandoren-redis'), { :acceptable_exit_codes => [0,1] }
     on host, puppet('module', 'install', 'puppetlabs-inifile'), { :acceptable_exit_codes => [0,1] }
-    on host, puppet('module', 'install', 'rodjek-logrotate'), { :acceptable_exit_codes => [0,1] }
+    on host, puppet('module', 'install', 'yo61-logrotate'), { :acceptable_exit_codes => [0,1] }
   end
 end
 

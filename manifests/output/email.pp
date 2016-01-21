@@ -4,7 +4,7 @@
 #
 # === Parameters:
 # * host (string): The SMTP Server Hostname
-# * port (integer): The SMTP Server Port 
+# * port (integer): The SMTP Server Port
 # * username (string): Username for logging into SMTP Server (optional)
 # * password (string): Password for logging into SMTP Server (optional)
 #
@@ -18,11 +18,12 @@ class cabot::output::email (
   $username = undef,
   $password = undef,
 ) {
-  # TODO - validation
-  
+  validate_string($host)
+
   if ($username == undef) {
     $auth = 'absent'
   } else {
+    validate_string($username, $password)
     $auth = 'present'
   }
 

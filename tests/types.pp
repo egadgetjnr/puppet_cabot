@@ -13,7 +13,7 @@
 #  ensure         => present,
 #  users          => ['nicolas'],
 #  alerts_enabled => true,
-#  status_checks  => ['test_check1'],       # TODO - BUG? Can't set it empty...
+#  status_checks  => ['test_check1'],
 #  alerts         => ['Hipchat', 'Email'],
 #  url            => 'http://www.rcswimax.com',
 #  instances      => ['test2'],

@@ -4,7 +4,7 @@
 #
 # === Parameters:
 # * account_sid (string): Your Twilio SID
-# * auth_token (string): Your Twilio Authentication Token 
+# * auth_token (string): Your Twilio Authentication Token
 # * outgoing_number (string): The number to use for outgoing comms
 #
 # === Authors
@@ -16,8 +16,8 @@ class cabot::output::twilio (
   $auth_token,
   $outgoing_number,
 ) {
-  # TODO - validation
-  
+  validate_string($account_sid, $auth_token, $outgoing_number)
+
   cabot::alert_plugin { 'twilio':
     config => {
       'TWILIO_ACCOUNT_SID'     => {

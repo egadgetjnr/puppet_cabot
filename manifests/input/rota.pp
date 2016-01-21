@@ -12,8 +12,8 @@
 class cabot::input::rota (
   $url,
 ) {
-  # TODO - validation
-  
+  validate_string($url)
+
   cabot::custom_settings { 'rota':
     config => {
       'CALENDAR_ICAL_URL' => {

@@ -144,37 +144,50 @@ Puppet::Type.type(:cabot_service).provide :rest, :parent => Puppet::Provider::Ca
       
     id = self.class.genericLookup('services', 'name', resource[:name], 'id')
       
-    users_to_notify = Array.new
-    resource[:users].each do |user|
-      users_to_notify.push self.class.userLookupByName(user)
-    end
-    
-    status_checks = Array.new
-    resource[:status_checks].each do |status_check|
-      status_checks.push self.class.genericLookup('status_checks', 'name', status_check, 'id')
-    end
-    
-    alerts = Array.new
-    resource[:alerts].each do |alert|
-      alerts.push self.class.genericLookup('alertplugins', 'title', alert, 'id')
-    end
-
-    instances = Array.new
-    resource[:instances].each do |instance|
-      instances.push self.class.genericLookup('instances', 'name', instance, 'id')
-    end     
-    
     params = {         
-      :name             => resource[:name],
-      :users_to_notify  => users_to_notify,
-      :alerts_enabled   => resource[:alerts_enabled],
-      :status_checks    => status_checks,
-      :alerts           => alerts,
-      :hackpad_id       => resource[:hackpad_id],
-      :url              => resource[:url],       
-      :instances        => instances,
+      :name => resource[:name],
     }
       
+    if ! resource[:users].nil?
+      users_to_notify = resource[:users].collect do |user|
+        self.class.userLookupByName(user)
+      end
+      params[:users_to_notify] = users_to_notify
+    end
+      
+    if ! resource[:alerts_enabled].nil?
+      params[:alerts_enabled] = resource[:alerts_enabled]
+    end
+
+    if ! resource[:status_checks].nil?
+      status_checks = resource[:status_checks].collect do |user|
+        self.class.genericLookup('status_checks', 'name', status_check, 'id')
+      end
+      params[:users_to_notify] = status_checks
+    end
+
+    if ! resource[:alerts].nil?
+      alerts = resource[:alerts].collect do |user|
+        self.class.genericLookup('alertplugins', 'title', alert, 'id')
+      end
+      params[:users_to_notify] = alerts
+    end
+    
+    if ! resource[:hackpad_id].nil?
+      params[:hackpad_id] = resource[:hackpad_id]
+    end
+        
+    if ! resource[:url].nil?
+      params[:url] = resource[:url]
+    end
+      
+    if ! resource[:instances].nil?
+      instances = resource[:instances].collect do |user|
+        self.class.genericLookup('instances', 'name', instance, 'id')
+      end
+      params[:instances] = instances
+    end
+    
 #    Puppet.debug "PUT services/#{id}/ PARAMS = "+params.inspect
     response = self.class.http_put("services/#{id}/", params) # Trailing / is important !!
   end

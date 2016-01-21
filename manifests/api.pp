@@ -3,7 +3,7 @@
 # This class manages the configuration file that Puppet uses to call the Cabot REST API.
 #
 # Parameters:
-# * host (string): The host to call the API on. Default: 127.0.0.1 
+# * host (string): The host to call the API on. Default: 127.0.0.1
 # * port (integer): The port to call the API on. Default: 5000
 # * user (string): The username to authenticate onthe API. Default: cabot
 # * password (string): The password to authenticate onthe API.
@@ -19,11 +19,12 @@ class cabot::api (
   $password,
   $user  = 'cabot',
   $host  = '127.0.0.1',
-  $port  = '5000',
+  $port  = 5000,
   $users = {},
 ) {
-  # TODO - validation  
-  
+  validate_string($host, $user, $password)
+  validate_hash($users)
+
   # Config file location is currently statically configured (cabot_rest.rb)
   $cabot_config_dir = '/etc/cabot'
   $api_auth_file = "${cabot_config_dir}/puppet_api.yaml"
@@ -46,7 +47,7 @@ class cabot::api (
     content => template('cabot/api.yaml.erb')
   }
 
-  # Dependency Gems Installation 
+  # Dependency Gems Installation
   if versioncmp($::puppetversion, '4.0.0') < 0 {
     ensure_packages(['rest-client'], {'ensure' => 'present', 'provider' => 'gem'})
   } else {

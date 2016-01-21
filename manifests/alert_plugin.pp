@@ -4,7 +4,7 @@
 #
 # === Parameters:
 # * url (string): If your are installing a new plugin, enter the GIT URL
-# * version (string): present/absent or specific version of the plugin (= git tag) - Default: present 
+# * version (string): present/absent or specific version of the plugin (= git tag) - Default: present
 # * config (hash): Config Hash - eg. { 'PARAM_1'  => {'value' => '<VALUE>'},}
 #
 # === Authors
@@ -18,11 +18,14 @@ define cabot::alert_plugin (
 ) {
   $virtualenv = $::cabot::install_dir
   $env = $::cabot::environment
-  
-  # TODO - validation  
+
+  validate_re($version, ['present', 'absent', '^\d+\.\d+\.\d+$'])
+  validate_hash($config)
 
   # Installation
   if ($url != undef) {
+    validate_string($url)
+
     Python::Virtualenv[$virtualenv]
     ->
     python::pip { "cabot-alert-${name}" :

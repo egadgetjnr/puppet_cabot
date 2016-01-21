@@ -4,7 +4,7 @@
 #
 # === Parameters:
 # * room (string): The Hipchat Room to advertise to
-# * api_key (string): Your HipChat API Key 
+# * api_key (string): Your HipChat API Key
 # * api_url (string): API Endpoint - Default: https://api.hipchat.com/v1/rooms/message
 #
 # === Authors
@@ -16,8 +16,8 @@ class cabot::output::hipchat (
   $api_key,
   $api_url = 'https://api.hipchat.com/v1/rooms/message',
 ) {
-  # TODO - validation
-  
+  validate_string($room, $api_key, $api_url)
+
   cabot::alert_plugin { 'hipchat':
     config => {
       'HIPCHAT_URL'        => {

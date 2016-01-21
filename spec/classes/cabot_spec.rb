@@ -87,8 +87,6 @@ describe 'cabot' do
   end
   
   context "centos" do
-    #before { pending("TODO") }
-      
   	let(:facts) { {
 	    :osfamily 				           => 'RedHat',
 	  	:operatingsystem 		         => 'CentOS',

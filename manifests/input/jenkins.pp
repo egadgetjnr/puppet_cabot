@@ -4,7 +4,7 @@
 #
 # === Parameters:
 # * host (string): The Jenkins Hostname
-# * port (integer): The Jenkins Port 
+# * port (integer): The Jenkins Port
 # * username (string): Username for logging into Jenkins (optional)
 # * password (string): Password for logging into Jenkins (optional)
 #
@@ -15,21 +15,30 @@
 class cabot::input::jenkins (
   $host,
   $port,
-  $username,
-  $password,
+  $username = undef,
+  $password = undef,
 ) {
-  # TODO - validation
-  
+  validate_string($host)
+
+  if ($username == undef) {
+    $auth = 'absent'
+  } else {
+    validate_string($username, $password)
+    $auth = 'present'
+  }
+
   cabot::custom_settings { 'jenkins':
     config => {
       'JENKINS_API'  => {
         'value' => "http://${host}:${port}/"
       },
       'JENKINS_USER' => {
-        'value' => $username
+        'value'  => $username,
+        'ensure' => $auth
       },
       'JENKINS_PASS' => {
-        'value' => $password
+        'value'  => $password,
+        'ensure' => $auth
       },
     },
   }

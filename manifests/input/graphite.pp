@@ -4,7 +4,7 @@
 #
 # === Parameters:
 # * host (string): The Graphite(Web) Hostname
-# * port (integer): The Graphite(Web) Port 
+# * port (integer): The Graphite(Web) Port
 # * username (string): Username for logging into GraphiteWeb (optional)
 # * password (string): Password for logging into GraphiteWeb (optional)
 # * from (string): The timeframe for which the graph should be pulled. Default: -10min
@@ -20,11 +20,12 @@ class cabot::input::graphite (
   $password = undef,
   $from     = '-10min',
 ) {
-  # TODO - validation
-  
+  validate_string($host, $from)
+
   if ($username == undef) {
     $auth = 'absent'
   } else {
+    validate_string($username, $password)
     $auth = 'present'
   }
 

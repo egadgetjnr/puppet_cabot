@@ -35,7 +35,7 @@ PuppetLint::RakeTask.new :lint do |config|
   config.with_context = true  
   config.fail_on_warnings = true
   
-  config.fix = false                # TODO does not actually fix anything
+  config.fix = false
   
   config.log_format = "%{path}:%{linenumber}:%{check}:%{KIND}:%{message}"
   

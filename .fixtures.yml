@@ -37,8 +37,8 @@ fixtures:
       repo : "puppetlabs/apache"
       ref: "1.4.1"
     logrotate:
-      repo: "rodjek/logrotate"
-      ref: "1.1.1"
+      repo: "yo61/logrotate"
+      ref: "1.3.0"
     # Only for testing (or Puppetfile) - dependencies of above modules
     concat:
       repo: "puppetlabs/concat"

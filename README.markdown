@@ -18,6 +18,7 @@ Optional:
 * puppetlabs/nodejs
 * thomasvandoren/redis
 * puppetlabs/apache  
+* yo61/logrotate
 
 ## Installation
 1. Full setup (all local, nothing else needed) [requires all dependency modules] 
