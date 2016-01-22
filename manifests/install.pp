@@ -71,7 +71,7 @@ class cabot::install {
   # Get Source Code
   # puppetlabs/vcsrepo
   vcsrepo { $cabot::source_dir:
-    ensure   => $cabot::version,
+    ensure   => 'present',
     source   => $cabot::source_url,
     revision => $cabot::source_revision,
     provider => 'git',
