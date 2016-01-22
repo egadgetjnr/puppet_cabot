@@ -5,11 +5,8 @@
 # Parameters:
 # * host (string): The host to call the API on. Default: 127.0.0.1
 # * port (integer): The port to call the API on. Default: 5000
-# * user (string): The username to authenticate onthe API. Default: cabot
-# * password (string): The password to authenticate onthe API.
-# * users (hash): a hash of users and their ID as the API doesn't have this; eg.
-#   { 1 => 'cabot', 2 => 'user1' }
-# TODO - users hash must be retrievable somehow... This method is stupid !
+# * user (string): The username to authenticate on the API. Default: cabot
+# * password (string): The password to authenticate on the API.
 #
 # === Authors
 #
@@ -20,14 +17,13 @@ class cabot::api (
   $user  = 'cabot',
   $host  = '127.0.0.1',
   $port  = 5000,
-  $users = {},
 ) {
   validate_string($host, $user, $password)
-  validate_hash($users)
 
   # Config file location is currently statically configured (cabot_rest.rb)
   $cabot_config_dir = '/etc/cabot'
   $api_auth_file = "${cabot_config_dir}/puppet_api.yaml"
+  $user_script = "${cabot_config_dir}/get_user_hash.py"
 
   # How can I reach the REST API?
   $api_host = $host
@@ -35,16 +31,29 @@ class cabot::api (
   # Who can I authenticate as?
   $admin_user = $user
   $admin_password = $password
-  # List all users so Puppet can match username and ID
-  $users_hash = $users
+  # How can I call the script that fetches Django users?
+  $cabot_install_dir = $::cabot::install_dir
+  $cabot_environment = $::cabot::environment
 
   file { $cabot_config_dir:
     ensure => 'directory',
   }
-  ->
+
+  File[$cabot_config_dir] ->
   file { $api_auth_file:
     ensure  => file,
     content => template('cabot/api.yaml.erb')
+  }
+
+  # The API does not have an interface for user lookup and requires user ID rather than username.
+  # Install custom (Python/Django) script to retrieve the users (ID => name)
+  $cabot_source = $::cabot::source_dir
+
+  File[$cabot_config_dir] ->
+  file { $user_script:
+    ensure  => file,
+    mode    => '0755',
+    content => template('cabot/get_user_hash.py.erb')
   }
 
   # Dependency Gems Installation

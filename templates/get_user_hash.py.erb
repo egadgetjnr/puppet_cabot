@@ -1,0 +1,15 @@
+import sys, os
+
+sys.path.append('<%= @cabot_source %>/cabot')
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+from django.conf import settings
+
+from django.contrib.auth.models import User
+
+import json
+
+users = dict()
+for user in User.objects.all(): 
+  users[user.id] = user.username
+
+print json.dumps(users)

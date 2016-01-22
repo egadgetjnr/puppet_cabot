@@ -73,12 +73,11 @@ describe 'cabot class' do
   
   let(:api_setup_manifest) {
     <<-EOS
+    #{install_manifest}  
+    
     class { 'cabot::api': 
       user     => 'cabot',
-      password => 'password',
-      users    => {
-        1 => 'cabot',
-      }
+      password => 'password'
     }
     EOS
   }
@@ -284,6 +283,20 @@ describe 'cabot class' do
       result = apply_manifest(api_setup_manifest, :catch_failures => true)
       expect(result.exit_code).to be_zero
     end    
+    
+    describe file('/etc/cabot/puppet_api.yaml') do
+      its(:content) { should match /ip: "127.0.0.1"/ }
+      its(:content) { should match /port: "5000"/ }
+      its(:content) { should match /username: "cabot"/ }
+      its(:content) { should match /password: "password"/ }        
+      its(:content) { should match /install_dir: "\/opt\/cabot_venv"/ }
+      its(:content) { should match /environment: "production"/ }
+      its(:content) { should match /get_user_script: "\/etc\/cabot\/get_user_hash.py"/ }
+    end
+        
+    describe file('/etc/cabot/get_user_hash.py') do
+      its(:content) { should match /sys.path.append\('\/opt\/cabot_source\/cabot'\)/ }
+    end
     
     it 'should run api-1 manifest' do
       # Run without errors

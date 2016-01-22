@@ -48,12 +48,32 @@ class Puppet::Provider::CabotRest < Puppet::Provider
       raise "The configuration file #{config_file} should include password!"
     end
 
-    if yamldata.include?('users')
-      users = yamldata['users']
-    else
-      raise "The configuration file #{config_file} should include 'users' hash (id => username)!"
+    user_script = "/etc/cabot/get_user_hash.py"
+    if ! File.exist?(user_script) 
+      raise "Could not read get_user_hash script #{user_script}"    
     end
-      
+    
+    if yamldata.include?('install_dir')
+      install_dir = yamldata['install_dir']
+    else
+      install_dir = '/opt/cabot_venv'
+    end
+
+    if yamldata.include?('environment')
+      environment = yamldata['environment']
+    else
+      environment = 'production'
+    end
+
+    if yamldata.include?('get_user_script')
+      get_user_script = yamldata['get_user_script']
+    else
+      get_user_script = '/etc/cabot/get_user_hash.py'
+    end
+
+    users_json = `foreman run -e #{install_dir}/conf/#{environment}.env #{install_dir}/bin/python #{get_user_script}`
+    users = JSON.load(users_json)
+    
     result = { 
       :ip       => ip, 
       :port     => port,
@@ -72,6 +92,7 @@ class Puppet::Provider::CabotRest < Puppet::Provider
         
       id = users.key(name)
       if id == nil
+        Puppet.debug("Users: #{users}")
         raise "Users Hash does not contain user #{name}"
       else
         users.key(name)
@@ -86,9 +107,10 @@ class Puppet::Provider::CabotRest < Puppet::Provider
     if rest.key?(:users)
       users = rest[:users]
       
-      if users.key?(id)
-        users[id]
+      if users.key?(id.to_s)
+        users[id.to_s]
       else
+        Puppet.debug("Users: #{users}")
         raise "Users Hash does not contain user with ID = #{id}"
       end
     else
