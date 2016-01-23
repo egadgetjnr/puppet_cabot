@@ -71,7 +71,13 @@ class Puppet::Provider::CabotRest < Puppet::Provider
       get_user_script = '/etc/cabot/get_user_hash.py'
     end
 
-    users_json = `foreman run -e #{install_dir}/conf/#{environment}.env #{install_dir}/bin/python #{get_user_script}`
+    if yamldata.include?('foreman_path')
+      foreman_path = yamldata['foreman_path']
+    else
+      foreman_path = '/usr/local/bin/foreman'
+    end
+
+    users_json = `#{foreman_path} run -e #{install_dir}/conf/#{environment}.env #{install_dir}/bin/python #{get_user_script}`
     users = JSON.load(users_json)
     
     result = { 

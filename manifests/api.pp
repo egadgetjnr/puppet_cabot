@@ -34,6 +34,9 @@ class cabot::api (
   # How can I call the script that fetches Django users?
   $cabot_install_dir = $::cabot::install_dir
   $cabot_environment = $::cabot::environment
+  # Where can I find Foreman?
+    # Ubuntu 14.04
+  $foreman_path = '/usr/local/bin/foreman'
 
   file { $cabot_config_dir:
     ensure => 'directory',
