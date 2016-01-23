@@ -1,5 +1,9 @@
 # Puppet Module for Arachnys Cabot
-==================================
+===========================================
+
+[![Build Status](https://travis-ci.org/Lavaburn/puppet_cabot.png)](https://travis-ci.org/Lavaburn/puppet_cabot)
+[![Coverage Status](https://coveralls.io/repos/github/Lavaburn/puppet_cabot/badge.svg?branch=master)](https://coveralls.io/github/Lavaburn/puppet_cabot?branch=master)
+[![Puppet Forge](http://img.shields.io/puppetforge/v/Lavaburn/cabot.svg)](https://forge.puppetlabs.com/Lavaburn/cabot)
 
 ## Overview 
 This module installs and sets up Cabot for first use 
@@ -76,3 +80,27 @@ cabot::alert_plugin { 'NAME':
   },
 }
 ```
+
+## Testing
+
+### Set up for testing
+```
+gem install bundler
+bundle install
+```
+
+To choose a different Puppet version, use PUPPET_VERSION environmental variable
+```
+PUPPET_VERSION="4.2.3" bundle install
+```
+
+### Syntax and Spec Testing
+```
+bundle exec rake test
+```
+
+### Acceptance testing with Beaker
+```
+bundle exec rake beaker
+```
+You can use the environmental variables BEAKER_debug, BEAKER_destroy and BEAKER_provision 

@@ -1,0 +1,22 @@
+language: ruby
+rvm:
+- 1.9.3
+- 2.1.8
+- 2.2.4
+env:
+- PUPPET_VERSION=3.7.5
+- PUPPET_VERSION=3.8.5
+- PUPPET_VERSION=4.2.3
+- PUPPET_VERSION=4.3.1
+bundler_args: --without integration_test development
+install:
+- bundle install
+script:
+- bundle exec rake test
+notifications:
+  email:
+    recipients:
+    - nicolas@truyens.com
+  hipchat:
+    rooms:
+      secure: KrIJPfv+PGNpw/a0uQC0EasOpDfV3IdepRAnQtCsHjoXvBUGrqDaWKhzkLtokF+RLXmxFj+K1DZIgjp8cUe5GGaYVLqrIC9SKO78Teqz+hM85K8VzPQ7kJLxXMtEpNxkGuRTJtApzFSxuokkF70azbQ+ntKNJGfIvO7KoVCSVQYRpST1djsobazho4vZjsc/+DdBMzJ2SBZAbXg9P9xCMSpLyyzduswg9ijErjy+zR+1jAgE18BL8C7U7sbXFcNMbwxQuEWsOevh/+WuTv0VxWHvVixyh7xd/SaTEPldxSPnnr8CHh7A/fsF1tfTbV0CIDi7fhUTy3uDdji6OqlbW85rtvYirhLDIIbKFHDlaLOsMRM0qDBSM5mKHeabcQW+VGVg4I87t0GUqyLrQqLH40Zs5onuNwraYHvNmrDz5YT/gBof1tXCBeQ1//PXTGGglCUua4j+U5uEK6EKSWCafnW7WOL3wpda0CRvdkMKwjO0VUD/jk9tYYiC3uGTCJWKYs/6uurmWEqwVqCkcRv19Cke5AS1SZXbg5pC8ve3LbMFNmJjYpec/38ZBtotnROl3K6DuSThjFedRMNRYDRW5Y41bB/eXcI09lz20XsAJue5b/nsPwHXjuUYvry/5Y3lkw8m8nzWOMjl0QHT6cAdyZ3tM3bc6NiqzBAAvHc8Nyo=
