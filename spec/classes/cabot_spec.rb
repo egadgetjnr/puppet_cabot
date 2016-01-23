@@ -12,6 +12,8 @@ describe 'cabot' do
 	  	:lsbdistcodename 			    => 'precise',
 	  	:operatingsystemrelease 	=> '12.04',
 	  	:concat_basedir  			    => '/tmp', # Concat	 
+      :puppetversion            => '3.8.5',
+      :virtualenv_version       => '12.0', # Should not matter for spec tests (python dependency)
 	  } }
 	  
     let(:params) { {
@@ -94,6 +96,8 @@ describe 'cabot' do
 	  	:lsbmajdistrelease           => '6',
 	  	:operatingsystemmajrelease   => '6',
 	  	:concat_basedir  		         => '/tmp',
+      :puppetversion               => '3.8.5',
+      :virtualenv_version          => '12.0', # Should not matter for spec tests (python dependency)
 	  	:clientcert				           => 'centos',	# HIERA !!!
       :kernel                      => 'Linux',
 	  } }

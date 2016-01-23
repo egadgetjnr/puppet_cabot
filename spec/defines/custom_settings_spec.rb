@@ -16,6 +16,8 @@ describe 'cabot::custom_settings', :type => :define do
 	  	:lsbdistcodename 			    => 'precise',
 	  	:operatingsystemrelease 	=> '12.04',
 	  	:concat_basedir  			    => '/tmp', # Concat	 
+      :puppetversion            => '3.8.5',
+      :virtualenv_version       => '12.0', # Should not matter for spec tests (python dependency)
 	  } }
 	  
     #  describe "???" do

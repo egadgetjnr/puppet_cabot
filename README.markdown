@@ -2,7 +2,7 @@
 ===========================================
 
 [![Build Status](https://travis-ci.org/Lavaburn/puppet_cabot.png)](https://travis-ci.org/Lavaburn/puppet_cabot)
-[![Coverage Status](https://coveralls.io/repos/github/Lavaburn/puppet_cabot/badge.svg?branch=master)](https://coveralls.io/github/Lavaburn/puppet_cabot?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/Lavaburn/puppet_cabot/badge.svg?branch=v2)](https://coveralls.io/github/Lavaburn/puppet_cabot?branch=v2)
 [![Puppet Forge](http://img.shields.io/puppetforge/v/Lavaburn/cabot.svg)](https://forge.puppetlabs.com/Lavaburn/cabot)
 
 ## Overview 
@@ -80,6 +80,20 @@ cabot::alert_plugin { 'NAME':
   },
 }
 ```
+
+## Supported Environments
+
+* Ruby 1.9.3 - Supported
+* Ruby 2.1.8 - Supported
+* Ruby 2.2.4 - Supported on Puppet 4
+
+* Puppet 3.7.5 - Supported (on Ruby <= 2.2)
+* Puppet 3.8.5 - Not Supported (Strange rspec errors)
+* Puppet 4.2.3 - Supported
+* Puppet 4.3.1 - Supported
+
+Acceptance tested on:
+* Ubuntu 14.04
 
 ## Testing
 
