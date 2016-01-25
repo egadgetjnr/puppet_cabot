@@ -18,6 +18,7 @@ end
 
 # Directories that don't need to be checked (Lint/Syntax)
 exclude_paths = [
+  "pkg/**/*",
 	"spec/**/*",
   "examples/**/*",
 ]

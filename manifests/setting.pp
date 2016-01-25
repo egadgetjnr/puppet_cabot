@@ -29,5 +29,5 @@ define cabot::setting (
 
   # Not for exported version !
   File["${dir}/conf"] -> Ini_setting["cabot_${env}_${name}"] -> Anchor['cabot_config']
-  Ini_setting["cabot_${env}_${name}"] ~> Service['cabot']
+  Ini_setting["cabot_${env}_${name}"] ~> Exec['cabot init-script']
 }
