@@ -37,9 +37,12 @@ class cabot::install {
   # Distro Packages
   if ($cabot::install_dependencies) {
     if $::osfamily == 'Debian' {
-      ensure_packages(['libpq-dev', 'libldap2-dev', 'libsasl2-dev'], {
-        ensure => 'installed'
-      })
+      package { [
+        'libpq-dev',
+        'libldap2-dev',
+        'libsasl2-dev']:
+        ensure => 'installed',
+      }
     } else {
       fail("Unsupported operating system family: ${::osfamily}. No dependency packages defined for this OS.")
     }
@@ -47,10 +50,10 @@ class cabot::install {
 
   # (Ruby) Gem Packages
   if ($cabot::install_gem_packages) {
-    ensure_packages(['foreman'], {
+    package { 'foreman':
       ensure   => 'installed',
-      provider => 'gem'
-    })
+      provider => 'gem',
+    }
   }
 
   # (NodeJS) NPM Packages
@@ -59,7 +62,7 @@ class cabot::install {
     ensure_packages(['coffee-script', 'less'], {
       ensure   => 'installed',
       provider => 'npm',
-      require  => Class['::nodejs'],
+      require => Class['::nodejs'],
     })
   }
 
