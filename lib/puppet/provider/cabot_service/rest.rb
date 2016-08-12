@@ -160,17 +160,17 @@ Puppet::Type.type(:cabot_service).provide :rest, :parent => Puppet::Provider::Ca
     end
 
     if ! resource[:status_checks].nil?
-      status_checks = resource[:status_checks].collect do |status_check|
+      status_checks = resource[:status_checks].collect do |user|
         self.class.genericLookup('status_checks', 'name', status_check, 'id')
       end
-      params[:status_checks] = status_checks
+      params[:users_to_notify] = status_checks
     end
 
     if ! resource[:alerts].nil?
-      alerts = resource[:alerts].collect do |alert|
+      alerts = resource[:alerts].collect do |user|
         self.class.genericLookup('alertplugins', 'title', alert, 'id')
       end
-      params[:alerts] = alerts
+      params[:users_to_notify] = alerts
     end
     
     if ! resource[:hackpad_id].nil?

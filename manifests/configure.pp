@@ -25,7 +25,6 @@ class cabot::configure {
       delaycompress => true,
       rotate        => $cabot::rotate_count,
       rotate_every  => $cabot::rotate_every,
-      postrotate    => 'service cabot restart',
     }
   }
 
